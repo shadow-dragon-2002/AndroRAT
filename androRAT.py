@@ -35,8 +35,11 @@ args = parser.parse_args()
 
 
 
-if float(platform.python_version()[:3]) < 3.6 and float(platform.python_version()[:3]) > 3.8 :
-    print(stdOutput("error")+"\033[1mPython version should be between 3.6 to 3.8")
+import sys
+
+# Check Python version properly 
+if sys.version_info < (3, 6):
+    print(stdOutput("error")+"\033[1mPython version should be 3.6 or higher")
     sys.exit()
 
 if args.build:

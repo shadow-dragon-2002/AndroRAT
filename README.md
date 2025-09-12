@@ -7,13 +7,19 @@
 
 AndroRAT is a tool designed to give the control of the android system remotely and retrieve informations from it. Androrat is a client/server application developed in Java Android for the client side and the Server is in Python.
 
-##### AndroRAT will work on device from Android 4.1 (Jelly Bean) to Android 9.0 (Oreo) (API 16 to API 28)
+##### AndroRAT will work on device from Android 5.0 (Lollipop) to Android 13+ (API 21 to API 33+)
 
-> AndroRAT also works on Android 10 (Q) but some of the interpreter command will be unstable. 
+> AndroRAT now supports modern Android versions including Android 10, 11, 12, and 13 with proper runtime permissions and foreground service handling. 
 
 ## Screenshots
 
-![AndroRAT](Screenshots/5.jpg "AndroRAT in action")
+![AndroRAT GUI](gui_screenshot.png "AndroRAT GUI Interface")
+
+*New GUI interface for easy APK building and connection management*
+
+![AndroRAT CLI](Screenshots/5.jpg "AndroRAT CLI in action")
+
+*Traditional CLI interface still available for advanced users*
 ## Features of AndroRAT 
 * Full persistent backdoor
 * ~~Fully undetectable by any antivirus scanner [VirusTotal](https://www.virustotal.com/gui/file/e900b5d37ad8c8f79ca000b148253af04696a85fdfc245861cfb226dd86562df/detection)~~
@@ -26,7 +32,7 @@ AndroRAT is a tool designed to give the control of the android system remotely a
 
 
 ## Prerequisites
-AndroRAT requires Python3 and JAVA (or Android Studio)
+AndroRAT requires Python3.6+ and JAVA (or Android Studio)
 
 ## Installation
 ```
@@ -34,6 +40,19 @@ git clone https://github.com/karma9874/AndroRAT.git
 cd AndroRAT
 pip install -r requirements.txt
 ```
+
+## New Features
+🎉 **GUI Interface**: AndroRAT now includes a user-friendly graphical interface!
+- Easy APK building with form-based interface
+- Shell connection management
+- Activity logs and status monitoring
+- Both CLI and GUI modes available
+
+🔧 **Android Compatibility**: Updated for modern Android versions
+- Supports Android 13+ (API 33+)
+- Updated runtime permissions for newer Android versions
+- Foreground service support for background operations
+- Scoped storage compatibility
 #### Note: 
 While cloning the repository using Git bash on Windows, you may get the following error:
 > error: unable to create file \<filename>: Filename too long
@@ -47,6 +66,23 @@ You can circumvent this by setting `core.longpaths` to `true`.
 You must run Git bash with administrator privileges. 
 
 ## Usage (Windows and Linux)
+
+### GUI Mode (Recommended for new users)
+```
+python3 androRAT_gui.py
+```
+or
+```
+python3 launcher.py --gui
+```
+
+The GUI provides an intuitive interface for:
+- Building APKs with configuration forms
+- Managing shell connections
+- Viewing activity logs and status
+- All functionality available through easy-to-use interface
+
+### CLI Mode (Advanced users)
 
 * To get the control panel of the app dial `*#*#1337#*#*` (For now it has only two options `Restart Activity` and `Uninstall`)
 > Note: In order to use this feature in some devices you need to enable the option `display pop-up windows running in background` from the settings.
@@ -114,6 +150,22 @@ In the sh shell there are some sub commands
     get [full_file_path]        --> donwloads the file to the local machine (file size upto 15mb)
     put [filename]              --> uploads the file to the android device
 ```
+
+## Testing
+
+AndroRAT includes a comprehensive test suite to validate functionality:
+
+```bash
+python3 test_androrat.py
+```
+
+This will test:
+- Python version compatibility
+- CLI functionality 
+- GUI module imports
+- Android manifest updates
+- Android gradle configuration
+- Java availability for APK building
 
 ## Examples
 
