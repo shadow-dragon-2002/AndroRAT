@@ -156,16 +156,19 @@ root.destroy()
         with open(manifest_path, 'r') as f:
             content = f.read()
             
-        # Check for Android 13+ permissions
+        # Check for Android 14+ permissions
         required_permissions = [
             'POST_NOTIFICATIONS',
             'READ_MEDIA_IMAGES',
             'READ_MEDIA_VIDEO',
             'READ_MEDIA_AUDIO',
+            'READ_MEDIA_VISUAL_USER_SELECTED',
             'FOREGROUND_SERVICE',
             'FOREGROUND_SERVICE_CAMERA',
             'FOREGROUND_SERVICE_MICROPHONE',
-            'FOREGROUND_SERVICE_LOCATION'
+            'FOREGROUND_SERVICE_LOCATION',
+            'FOREGROUND_SERVICE_DATA_SYNC',
+            'USE_FULL_SCREEN_INTENT'
         ]
         
         for permission in required_permissions:
@@ -191,11 +194,11 @@ root.destroy()
         with open(gradle_path, 'r') as f:
             content = f.read()
             
-        # Check SDK versions
-        self.assertIn('compileSdkVersion 33', content)
-        self.assertIn('targetSdkVersion 33', content)
-        self.assertIn('minSdkVersion 21', content)
-        print("✓ SDK versions updated to Android 13+ (API 33)")
+        # Check SDK versions (Android 14+)
+        self.assertIn('compileSdkVersion 34', content)
+        self.assertIn('targetSdkVersion 34', content)
+        self.assertIn('minSdkVersion 23', content)
+        print("✓ SDK versions updated to Android 14+ (API 34)")
         
         # Check dependencies
         modern_deps = [

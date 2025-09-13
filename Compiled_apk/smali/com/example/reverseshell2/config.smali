@@ -1,4 +1,4 @@
-.class public Lcom/example/reverseshell2/config;
+.class public Lcom/example/networklib2/config;
 .super Ljava/lang/Object;
 .source "config.java"
 
@@ -18,17 +18,17 @@
     .line 4
     const-string v0, "127.0.0.1"
 
-    sput-object v0, Lcom/example/reverseshell2/config;->IP:Ljava/lang/String;
+    sput-object v0, Lcom/example/networklib2/config;->IP:Ljava/lang/String;
 
     .line 5
-    const-string v0, "invalid_port"
+    const-string v0, "8080"
 
-    sput-object v0, Lcom/example/reverseshell2/config;->port:Ljava/lang/String;
+    sput-object v0, Lcom/example/networklib2/config;->port:Ljava/lang/String;
 
     .line 6
     const/4 v0, 0x1
 
-    sput-boolean v0, Lcom/example/reverseshell2/config;->icon:Z
+    sput-boolean v0, Lcom/example/networklib2/config;->icon:Z
 
     return-void
 .end method
