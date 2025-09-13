@@ -2,3 +2,10 @@
 /Dumps
 /karma.apk
 /test.py
+# Enhanced AndroRAT specific ignores
+test_*.apk
+stealth_*.apk
+*.log
+temp/
+.idea/
+.vscode/
