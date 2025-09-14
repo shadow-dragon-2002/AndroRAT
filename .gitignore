@@ -9,3 +9,13 @@ stealth_*.apk
 temp/
 .idea/
 .vscode/
+# Python cache files
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
