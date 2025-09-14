@@ -9,9 +9,10 @@ Demonstrates the advanced GUI functionality when tkinter is available
 import sys
 import os
 
-# Add project root to path
-project_root = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, project_root)
+# Add server directory to path for imports
+tools_dir = os.path.dirname(os.path.abspath(__file__))
+server_dir = os.path.join(os.path.dirname(tools_dir), 'server')
+sys.path.insert(0, server_dir)
 
 def check_gui_availability():
     """Check if GUI components can be loaded"""

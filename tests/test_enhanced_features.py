@@ -13,9 +13,9 @@ import tempfile
 import shutil
 from pathlib import Path
 
-# Add the project root to Python path
-project_root = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, project_root)
+# Import test utilities to setup paths
+from test_utils import setup_server_path, get_project_root
+setup_server_path()
 
 class EnhancedAndroRATTests(unittest.TestCase):
     
