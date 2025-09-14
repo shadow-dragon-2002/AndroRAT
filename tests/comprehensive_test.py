@@ -8,6 +8,10 @@ Extended testing for CLI, GUI, and APK compatibility
 
 import sys
 import os
+
+# Import test utilities to setup paths
+from test_utils import setup_server_path, get_project_root
+setup_server_path()
 import subprocess
 import tempfile
 import shutil
@@ -103,9 +107,10 @@ class ComprehensiveAndroRATTests(unittest.TestCase):
         print("\n=== GUI Import and Basic Functionality ===")
         
         # Test GUI module import
+        server_dir = get_project_root() + '/server'
         result = subprocess.run([
             sys.executable, '-c', 
-            'import androRAT_gui; print("GUI import successful")'
+            f'import sys; sys.path.insert(0, "{server_dir}"); import androRAT_gui; print("GUI import successful")'
         ], cwd=self.test_dir, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0)
         self.assertIn('GUI import successful', result.stdout)
@@ -115,6 +120,8 @@ class ComprehensiveAndroRATTests(unittest.TestCase):
         gui_test_code = '''
 import os
 os.environ["DISPLAY"] = ":99"
+import sys
+sys.path.insert(0, "../server")
 import tkinter as tk
 import androRAT_gui
 root = tk.Tk()

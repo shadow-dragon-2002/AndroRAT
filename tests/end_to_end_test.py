@@ -9,6 +9,10 @@ Comprehensive testing for all components including GUI, Android features, and in
 import unittest
 import sys
 import os
+
+# Import test utilities to setup paths
+from test_utils import setup_server_path, get_project_root
+setup_server_path()
 import subprocess
 import threading
 import time
