@@ -270,12 +270,13 @@ def main():
     # Run unit tests
     print("\nRunning unit tests...")
     
-    # Create test suite
+    # Create test suite using TestLoader (modern approach)
+    loader = unittest.TestLoader()
     suite = unittest.TestSuite()
     
     # Add test cases
-    suite.addTest(unittest.makeSuite(EnhancedAndroRATTests))
-    suite.addTest(unittest.makeSuite(IntegrationTests))
+    suite.addTest(loader.loadTestsFromTestCase(EnhancedAndroRATTests))
+    suite.addTest(loader.loadTestsFromTestCase(IntegrationTests))
     
     # Run tests
     runner = unittest.TextTestRunner(verbosity=2)
