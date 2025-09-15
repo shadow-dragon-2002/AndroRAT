@@ -8,6 +8,12 @@ Creates a visual demonstration of the AndroRAT GUI
 
 import sys
 import os
+
+# Add server directory to path for imports
+tools_dir = os.path.dirname(os.path.abspath(__file__))
+server_dir = os.path.join(os.path.dirname(tools_dir), 'server')
+sys.path.insert(0, server_dir)
+
 import tkinter as tk
 import subprocess
 import time

