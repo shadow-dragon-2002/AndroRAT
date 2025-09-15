@@ -1,0 +1,40 @@
+{
+  "cli_features_count": 17,
+  "cli_features": [
+    "build",
+    "shell",
+    "ngrok",
+    "tunnel",
+    "tunnel-service",
+    "i",
+    "p",
+    "o",
+    "icon",
+    "stealth",
+    "random-package",
+    "anti-analysis",
+    "play-protect-evasion",
+    "advanced-obfuscation",
+    "fake-certificates",
+    "inject",
+    "target-apk"
+  ],
+  "gui_count": 2,
+  "gui_summaries": [
+    {
+      "name": "Basic GUI",
+      "supported_features": 9,
+      "total_features": 17,
+      "method_count": 16,
+      "class_count": 1
+    },
+    {
+      "name": "Advanced GUI",
+      "supported_features": 8,
+      "total_features": 17,
+      "method_count": 49,
+      "class_count": 1
+    }
+  ],
+  "backend_functions": 67
+}
