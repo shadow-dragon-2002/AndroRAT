@@ -41,11 +41,12 @@ class AndroidProjectTests(unittest.TestCase):
     
     def setUp(self):
         self.test_dir = os.path.dirname(os.path.abspath(__file__))
+        self.project_root = get_project_root()
         os.chdir(self.test_dir)
         
     def test_android_project_structure(self):
         """Test Android project has correct structure"""
-        android_path = "Android_Code/app/src/main"
+        android_path = os.path.join(self.project_root, "Android_Code/app/src/main")
         self.assertTrue(os.path.exists(android_path), "Android project structure should exist")
         
         # Check key directories
@@ -56,11 +57,12 @@ class AndroidProjectTests(unittest.TestCase):
         ]
         
         for dir_path in key_dirs:
-            self.assertTrue(os.path.exists(dir_path), f"{dir_path} should exist")
+            full_path = os.path.join(self.project_root, dir_path)
+            self.assertTrue(os.path.exists(full_path), f"{dir_path} should exist")
             
     def test_modern_android_files(self):
         """Test that modern Android files exist"""
-        java_path = "Android_Code/app/src/main/java/com/example/reverseshell2"
+        java_path = os.path.join(self.project_root, "Android_Code/app/src/main/java/com/example/reverseshell2")
         
         # Check for enhanced files
         enhanced_files = [
@@ -89,7 +91,7 @@ class AndroidProjectTests(unittest.TestCase):
         
     def test_android_manifest_permissions(self):
         """Test Android manifest has required permissions"""
-        manifest_path = "Android_Code/app/src/main/AndroidManifest.xml"
+        manifest_path = os.path.join(self.project_root, "Android_Code/app/src/main/AndroidManifest.xml")
         self.assertTrue(os.path.exists(manifest_path), "AndroidManifest.xml should exist")
         
         with open(manifest_path, 'r') as f:
@@ -108,7 +110,7 @@ class AndroidProjectTests(unittest.TestCase):
             
     def test_gradle_configuration(self):
         """Test Gradle build configuration"""
-        gradle_path = "Android_Code/app/build.gradle"
+        gradle_path = os.path.join(self.project_root, "Android_Code/app/build.gradle")
         self.assertTrue(os.path.exists(gradle_path), "build.gradle should exist")
         
         with open(gradle_path, 'r') as f:
@@ -127,6 +129,8 @@ class GUITests(unittest.TestCase):
         
     def test_basic_gui_import(self):
         """Test basic GUI module import"""
+        if not TKINTER_AVAILABLE:
+            self.skipTest("tkinter not available - skipping basic GUI import test")
         try:
             import androRAT_gui
             self.assertTrue(True, "Basic GUI imported successfully")
@@ -135,6 +139,8 @@ class GUITests(unittest.TestCase):
             
     def test_advanced_gui_import(self):
         """Test advanced GUI module import"""
+        if not TKINTER_AVAILABLE:
+            self.skipTest("tkinter not available - skipping advanced GUI import test")
         try:
             import androRAT_advanced_gui
             self.assertTrue(True, "Advanced GUI imported successfully")
@@ -173,6 +179,7 @@ class CoreFunctionalityTests(unittest.TestCase):
     
     def setUp(self):
         self.test_dir = os.path.dirname(os.path.abspath(__file__))
+        self.project_root = get_project_root()
         os.chdir(self.test_dir)
         
     def test_main_androrat_import(self):
@@ -193,7 +200,7 @@ class CoreFunctionalityTests(unittest.TestCase):
             
     def test_config_file_exists(self):
         """Test configuration file exists"""
-        config_path = "config.ini"
+        config_path = os.path.join(self.project_root, "server", "config.ini")
         self.assertTrue(os.path.exists(config_path), "config.ini should exist")
 
 class IntegrationTests(unittest.TestCase):
@@ -201,13 +208,17 @@ class IntegrationTests(unittest.TestCase):
     
     def setUp(self):
         self.test_dir = os.path.dirname(os.path.abspath(__file__))
+        self.project_root = get_project_root()
+        self.server_dir = os.path.join(self.project_root, "server")
         os.chdir(self.test_dir)
         
     def test_help_command_execution(self):
         """Test that main script can display help"""
         try:
-            result = subprocess.run([sys.executable, "androRAT.py", "--help"], 
-                                  capture_output=True, text=True, timeout=30)
+            androrat_script = os.path.join(self.server_dir, "androRAT.py")
+            result = subprocess.run([sys.executable, androrat_script, "--help"], 
+                                  capture_output=True, text=True, timeout=30,
+                                  cwd=self.server_dir)
             self.assertEqual(result.returncode, 0, "Help command should execute successfully")
             self.assertIn("usage", result.stdout.lower(), "Help output should contain usage information")
         except subprocess.TimeoutExpired:
@@ -218,9 +229,11 @@ class IntegrationTests(unittest.TestCase):
     def test_version_or_basic_execution(self):
         """Test basic script execution"""
         try:
+            androrat_script = os.path.join(self.server_dir, "androRAT.py")
             # Try to run with minimal parameters to test basic functionality
-            result = subprocess.run([sys.executable, "androRAT.py", "--ip", "127.0.0.1"], 
-                                  capture_output=True, text=True, timeout=10)
+            result = subprocess.run([sys.executable, androrat_script, "--ip", "127.0.0.1"], 
+                                  capture_output=True, text=True, timeout=10,
+                                  cwd=self.server_dir)
             # Don't require success, just that it doesn't crash immediately
             self.assertIsNotNone(result.returncode, "Script should execute and return")
         except subprocess.TimeoutExpired:
@@ -234,11 +247,12 @@ class SecurityAndModernFeaturesTests(unittest.TestCase):
     
     def setUp(self):
         self.test_dir = os.path.dirname(os.path.abspath(__file__))
+        self.project_root = get_project_root()
         os.chdir(self.test_dir)
         
     def test_modern_permissions_in_manifest(self):
         """Test for modern Android permissions"""
-        manifest_path = "Android_Code/app/src/main/AndroidManifest.xml"
+        manifest_path = os.path.join(self.project_root, "Android_Code/app/src/main/AndroidManifest.xml")
         if not os.path.exists(manifest_path):
             self.skipTest("AndroidManifest.xml not found")
             
@@ -263,7 +277,7 @@ class SecurityAndModernFeaturesTests(unittest.TestCase):
         
     def test_secure_communication_implementation(self):
         """Test secure communication features"""
-        secure_tcp_path = "Android_Code/app/src/main/java/com/example/reverseshell2/SecureTcpConnection.java"
+        secure_tcp_path = os.path.join(self.project_root, "Android_Code/app/src/main/java/com/example/reverseshell2/SecureTcpConnection.java")
         
         if os.path.exists(secure_tcp_path):
             with open(secure_tcp_path, 'r') as f:
