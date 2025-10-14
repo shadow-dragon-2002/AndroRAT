@@ -4,11 +4,12 @@ This enhanced version of AndroRAT includes advanced detection evasion techniques
 
 ## 🚀 New Features
 
-### Android 14+ Compatibility
-- **Updated SDK**: Now targeting Android 14 (API 34) with backward compatibility to Android 6 (API 23)
-- **Modern Permissions**: Full support for Android 14+ permission model including scoped storage and media permissions
+### Android 15+ Compatibility
+- **Updated SDK**: Now targeting Android 15 (API 35) with backward compatibility to Android 6 (API 23)
+- **Modern Permissions**: Full support for Android 13-16 permission model including scoped storage and media permissions
+- **Android 15+ Features**: Body sensors background access and media projection state permissions
 - **Enhanced Foreground Services**: Proper service types and notification handling for Android 12+
-- **Runtime Permissions**: Automatic permission request handling for modern Android versions
+- **Runtime Permissions**: Automatic permission request handling for modern Android versions including Android 15/16
 
 ### 🛡️ Detection Evasion Techniques
 
@@ -52,8 +53,10 @@ python3 androRAT.py --build --stealth --random-package -i 127.0.0.1 -p 8080 -o s
 ## 🔧 Technical Improvements
 
 ### Android Manifest Enhancements
-- Android 14+ media permissions (`READ_MEDIA_VISUAL_USER_SELECTED`)
-- Enhanced foreground service types (`dataSync`, `camera`, `microphone`, `location`)
+- Android 13+ media permissions (`POST_NOTIFICATIONS`, `READ_MEDIA_*`)
+- Android 14+ visual media permissions (`READ_MEDIA_VISUAL_USER_SELECTED`)
+- Android 15+ permissions (`BODY_SENSORS_BACKGROUND`, `ACCESS_MEDIA_PROJECTION_STATE`)
+- Enhanced foreground service types (`dataSync`, `camera`, `microphone`, `location`, `health`)
 - Proper component export declarations
 - Network security configuration for cleartext traffic
 
@@ -75,7 +78,9 @@ python3 androRAT.py --build --stealth --random-package -i 127.0.0.1 -p 8080 -o s
 | Android 6.0+   | 23+       | ✅ Full Support |
 | Android 12+    | 31+       | ✅ Enhanced Features |
 | Android 13+    | 33+       | ✅ Modern Permissions |
-| Android 14+    | 34+       | ✅ Latest Features |
+| Android 14+    | 34+       | ✅ Visual Media Features |
+| Android 15+    | 35+       | ✅ Latest Features |
+| Android 16     | 36        | ✅ Future Ready |
 
 ## 🧪 Testing
 
@@ -111,6 +116,12 @@ This tool is for educational and authorized security testing purposes only. User
 4. Use stealth mode for maximum evasion effectiveness
 
 ## 🔄 Changelog
+
+### v2.1 - Android 15/16 Support
+- Added Android 15 (API 35) and Android 16 (API 36) compatibility
+- Updated SDK to API 35 for latest Android features
+- Added Android 15+ specific permissions (BODY_SENSORS_BACKGROUND, ACCESS_MEDIA_PROJECTION_STATE)
+- Enhanced foreground service types for health data
 
 ### v2.0 - Enhanced Detection Evasion
 - Added Android 14+ compatibility
