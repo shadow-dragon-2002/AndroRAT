@@ -157,7 +157,8 @@ root.destroy()
         print("\n=== Android Configuration Validation ===")
         
         # Test Android manifest
-        manifest_path = os.path.join(self.test_dir, 'Android_Code/app/src/main/AndroidManifest.xml')
+        project_root = get_project_root()
+        manifest_path = os.path.join(project_root, 'Android_Code/app/src/main/AndroidManifest.xml')
         self.assertTrue(os.path.exists(manifest_path))
         
         with open(manifest_path, 'r') as f:
@@ -197,7 +198,8 @@ root.destroy()
         """Test Android Gradle configuration"""
         print("\n=== Android Gradle Configuration ===")
         
-        gradle_path = os.path.join(self.test_dir, 'Android_Code/app/build.gradle')
+        project_root = get_project_root()
+        gradle_path = os.path.join(project_root, 'Android_Code/app/build.gradle')
         self.assertTrue(os.path.exists(gradle_path))
         
         with open(gradle_path, 'r') as f:
