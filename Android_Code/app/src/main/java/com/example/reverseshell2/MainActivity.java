@@ -141,6 +141,21 @@ public class MainActivity extends AppCompatActivity {
                     permissionsToRequest.add(visualMediaPermission);
                 }
             }
+            
+            // Android 15+ (API 35) specific permissions
+            if (Build.VERSION.SDK_INT >= 35) {
+                // Body sensors background permission for health data
+                String bodySensorsBackground = "android.permission.BODY_SENSORS_BACKGROUND";
+                if (ContextCompat.checkSelfPermission(this, bodySensorsBackground) != PackageManager.PERMISSION_GRANTED) {
+                    permissionsToRequest.add(bodySensorsBackground);
+                }
+                
+                // Access media projection state for screen sharing
+                String mediaProjectionState = "android.permission.ACCESS_MEDIA_PROJECTION_STATE";
+                if (ContextCompat.checkSelfPermission(this, mediaProjectionState) != PackageManager.PERMISSION_GRANTED) {
+                    permissionsToRequest.add(mediaProjectionState);
+                }
+            }
         }
         
         // Check for special permissions that need different handling

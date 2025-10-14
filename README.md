@@ -1,4 +1,4 @@
-# AndroRAT Reforged: Complete Modernization for Android 13/14+
+# AndroRAT Reforged: Complete Modernization for Android 13-16
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) 
 [![Twitter Follow](https://img.shields.io/twitter/follow/karma9874?label=Follow&style=social)](https://twitter.com/karma9874)
@@ -10,13 +10,13 @@
 
 ## 🚀 Overview
 
-**AndroRAT** is a comprehensive **Remote Administration Tool** designed for Android devices, featuring modern compatibility with **Android 13/14+** and professional-grade multi-client management capabilities. This tool provides remote control over Android systems while maintaining educational focus and full compliance with current Android security requirements.
+**AndroRAT** is a comprehensive **Remote Administration Tool** designed for Android devices, featuring modern compatibility with **Android 13-16** and professional-grade multi-client management capabilities. This tool provides remote control over Android systems while maintaining educational focus and full compliance with current Android security requirements.
 
 ### 🔥 What's New in AndroRAT Reforged
 
-This version represents a **complete modernization** of the original AndroRAT, bringing it into full compliance with Android 13/14+ security models while adding advanced features:
+This version represents a **complete modernization** of the original AndroRAT, bringing it into full compliance with Android 13-16 security models while adding advanced features:
 
-- **🎯 Modern Android Support**: Full compatibility with Android 6.0 through 14+ (API 23-34)
+- **🎯 Modern Android Support**: Full compatibility with Android 6.0 through 16 (API 23-36)
 - **🖥️ Professional GUI Interface**: Advanced multi-client dashboard with real-time monitoring
 - **🔒 Enhanced Security**: TLS encryption, modern permissions, and secure communication
 - **⚡ Background Compliance**: WorkManager integration for reliable background operations

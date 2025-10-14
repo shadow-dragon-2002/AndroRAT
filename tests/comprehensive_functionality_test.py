@@ -203,12 +203,12 @@ class AndroidCompatibilityTests(unittest.TestCase):
         with open(gradle_path, 'r') as f:
             content = f.read()
         
-        # Check for Android 14 (API 34)
-        self.assertIn('compileSdkVersion 34', content,
-                     "Should target Android 14")
-        self.assertIn('targetSdkVersion 34', content,
-                     "Should target Android 14")
-        print("✓ Android 14 (API 34) support configured")
+        # Check for Android 15 (API 35) - supports 14, 15, and 16
+        self.assertIn('compileSdkVersion 35', content,
+                     "Should target Android 15+")
+        self.assertIn('targetSdkVersion 35', content,
+                     "Should target Android 15+")
+        print("✓ Android 15+ (API 35) support configured")
         
     def test_workmanager_dependency(self):
         """Test WorkManager dependency for background tasks"""
@@ -239,6 +239,8 @@ class AndroidCompatibilityTests(unittest.TestCase):
             'FOREGROUND_SERVICE_CAMERA',  # Android 14+
             'FOREGROUND_SERVICE_MICROPHONE',  # Android 14+
             'FOREGROUND_SERVICE_LOCATION',  # Android 14+
+            'BODY_SENSORS_BACKGROUND',  # Android 15+
+            'ACCESS_MEDIA_PROJECTION_STATE',  # Android 15+
         ]
         
         found_permissions = []
