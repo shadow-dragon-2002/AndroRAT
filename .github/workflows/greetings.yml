@@ -1,0 +1,41 @@
+name: Greetings
+
+on: [pull_request_target, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: |
+          👋 Thanks for opening your first issue in AndroRAT! 
+          
+          We appreciate you taking the time to contribute to this educational project. 
+          
+          **Please remember:**
+          - This project is for educational and research purposes only
+          - For security vulnerabilities, please use the Security Advisory feature instead
+          - Check our [documentation](https://github.com/shadow-dragon-2002/AndroRAT/tree/master/docs) for guides and resources
+          - Review [CONTRIBUTING.md](https://github.com/shadow-dragon-2002/AndroRAT/blob/master/CONTRIBUTING.md) for contribution guidelines
+          
+          A maintainer will review your issue soon. Thank you for your patience! 🚀
+          
+        pr-message: |
+          🎉 Thanks for opening your first Pull Request in AndroRAT! 
+          
+          We're excited to review your contribution to this educational security research project.
+          
+          **Before merging:**
+          - Ensure all CI checks pass
+          - Make sure you've filled out the PR template completely
+          - Review [CONTRIBUTING.md](https://github.com/shadow-dragon-2002/AndroRAT/blob/master/CONTRIBUTING.md) if you haven't already
+          - Confirm your code follows our coding standards
+          
+          **Remember:** This project is for educational purposes only. All contributions must align with ethical and legal use.
+          
+          A maintainer will review your PR soon. Thank you for contributing! 🙏

@@ -1,0 +1,50 @@
+# Label pull requests based on changed files
+
+# Android Client
+android:
+  - Android_Code/**/*
+  - Android_Code/**/*.java
+  - Android_Code/**/*.xml
+  - Android_Code/**/*.gradle
+
+# Python Server
+python:
+  - server/**/*
+  - server/**/*.py
+  - '*.py'
+
+# Documentation
+documentation:
+  - docs/**/*
+  - '*.md'
+  - README.md
+  - CONTRIBUTING.md
+  - SECURITY.md
+  - CODE_OF_CONDUCT.md
+  - CHANGELOG.md
+
+# Testing
+testing:
+  - tests/**/*
+  - tests/**/*.py
+  - run_all_tests.py
+
+# CI/CD
+ci-cd:
+  - .github/**/*
+  - .github/workflows/**/*
+
+# Dependencies
+dependencies:
+  - requirements.txt
+  - Android_Code/build.gradle
+  - Android_Code/app/build.gradle
+
+# Tools
+tools:
+  - tools/**/*
+  - Jar_utils/**/*
+
+# Assets
+assets:
+  - assets/**/*

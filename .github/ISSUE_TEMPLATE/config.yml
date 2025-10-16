@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/shadow-dragon-2002/AndroRAT/tree/master/docs
+    about: Browse comprehensive documentation guides
+  - name: 🔒 Security Advisory
+    url: https://github.com/shadow-dragon-2002/AndroRAT/security/advisories/new
+    about: Report security vulnerabilities privately
+  - name: 💬 Discussions
+    url: https://github.com/shadow-dragon-2002/AndroRAT/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🐦 Twitter - karma9874
+    url: https://twitter.com/karma9874
+    about: Follow the original creator for updates

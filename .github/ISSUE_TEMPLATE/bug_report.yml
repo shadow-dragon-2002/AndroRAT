@@ -1,0 +1,135 @@
+name: Bug Report
+description: Report a bug or issue with AndroRAT
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below to help us diagnose and fix the issue.
+        
+        **⚠️ Security Notice**: If this is a security vulnerability, please use the Security tab instead or refer to SECURITY.md
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - Android Client
+        - Python Server
+        - GUI Interface
+        - CLI Interface
+        - APK Builder
+        - APK Injection
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: android-version
+    attributes:
+      label: Android Version (if applicable)
+      description: What Android version are you testing on?
+      options:
+        - Android 16 (API 36)
+        - Android 15 (API 35)
+        - Android 14 (API 34)
+        - Android 13 (API 33)
+        - Android 12 (API 31-32)
+        - Android 11 (API 30)
+        - Android 10 (API 29)
+        - Android 9 (API 28)
+        - Android 8.x (API 26-27)
+        - Android 7.x (API 24-25)
+        - Android 6.0 (API 23)
+        - N/A (Server-side issue)
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe the bug...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Run command '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe what you expected to happen...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what actually happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide information about your environment
+      placeholder: |
+        - OS: [e.g., Ubuntu 22.04, Windows 11, macOS 13]
+        - Python Version: [e.g., 3.9.5]
+        - Java Version: [e.g., OpenJDK 11]
+        - Android Studio Version: [if applicable]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and Error Messages
+      description: Please paste any relevant log output or error messages
+      render: shell
+      placeholder: Paste logs here...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: Any additional information...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have read the documentation in the docs/ folder
+          required: true
+        - label: I have tested with the latest version of the code
+          required: true
+        - label: This is not a security vulnerability (those should be reported via SECURITY.md)
+          required: true

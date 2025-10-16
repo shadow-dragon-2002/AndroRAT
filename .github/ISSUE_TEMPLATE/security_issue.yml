@@ -1,0 +1,131 @@
+name: Security Issue
+description: Report a security vulnerability (use privately via Security tab when possible)
+title: "[SECURITY] "
+labels: ["security", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚠️ IMPORTANT: Security Vulnerability Reporting
+        
+        **For sensitive security issues, please use GitHub's private Security Advisory feature:**
+        1. Go to the Security tab
+        2. Click "Report a vulnerability"
+        3. Follow the private disclosure process
+        
+        **Only use this public issue template for:**
+        - Non-sensitive security enhancements
+        - Security documentation improvements
+        - General security questions
+        
+        **For critical vulnerabilities, please report privately to avoid exploitation.**
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity Level
+      description: How severe is this security issue?
+      options:
+        - Critical (Remote code execution, data breach)
+        - High (Privilege escalation, authentication bypass)
+        - Medium (Information disclosure, DoS)
+        - Low (Minor security improvement)
+        - Informational (Security best practice)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which component has the security issue?
+      options:
+        - Android Client
+        - Python Server
+        - Communication Protocol
+        - APK Builder
+        - APK Injection
+        - Authentication/Encryption
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Security Issue Description
+      description: Describe the security issue (avoid sensitive details in public issues)
+      placeholder: |
+        General description of the security concern...
+        
+        ⚠️ Do NOT include:
+        - Proof-of-concept exploits
+        - Specific vulnerable code locations
+        - Detailed attack vectors
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Potential Impact
+      description: What is the potential impact of this security issue?
+      placeholder: Describe the potential impact...
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected-versions
+    attributes:
+      label: Affected Versions
+      description: Which versions are affected?
+      placeholder: |
+        - Version X.X.X
+        - Commit SHA: abc123...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: disclosure-status
+    attributes:
+      label: Disclosure Status
+      description: Has this issue been publicly disclosed elsewhere?
+      options:
+        - No (Private disclosure)
+        - Yes (Already public)
+        - Coordinated disclosure in progress
+    validations:
+      required: true
+
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Suggested Mitigation
+      description: Do you have suggestions for fixing this issue?
+      placeholder: Potential fix or mitigation strategy...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: Additional context...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Responsible Disclosure Checklist
+      description: Please confirm the following
+      options:
+        - label: I have NOT publicly disclosed details of this vulnerability
+          required: true
+        - label: I understand this is an educational/research project
+          required: true
+        - label: I have reviewed SECURITY.md for reporting guidelines
+          required: true
+        - label: For critical issues, I will follow up with a private report via Security Advisory
+          required: true
