@@ -1,0 +1,176 @@
+name: Android 15/16 Upgrade Tests
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main, develop ]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  test-upgrade:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        
+    - name: Run Android 15/16 Upgrade Tests
+      run: |
+        cd tests
+        python3 test_android_15_16_upgrade.py
+        
+    - name: Run Comprehensive Functionality Tests
+      run: |
+        cd tests
+        python3 -c "
+        import sys
+        sys.path.insert(0, '.')
+        from comprehensive_functionality_test import AndroidCompatibilityTests
+        import unittest
+        
+        suite = unittest.TestSuite()
+        suite.addTests(unittest.TestLoader().loadTestsFromTestCase(AndroidCompatibilityTests))
+        
+        runner = unittest.TextTestRunner(verbosity=2)
+        result = runner.run(suite)
+        
+        sys.exit(0 if result.wasSuccessful() else 1)
+        "
+        
+    - name: Run Comprehensive Tests
+      run: |
+        cd tests
+        python3 -c "
+        import sys
+        sys.path.insert(0, '.')
+        from comprehensive_test import ComprehensiveAndroRATTests
+        import unittest
+        
+        suite = unittest.TestSuite()
+        suite.addTest(ComprehensiveAndroRATTests('test_07_android_configuration_validation'))
+        suite.addTest(ComprehensiveAndroRATTests('test_08_android_gradle_configuration'))
+        
+        runner = unittest.TextTestRunner(verbosity=2)
+        result = runner.run(suite)
+        
+        sys.exit(0 if result.wasSuccessful() else 1)
+        "
+        
+    - name: Check Gradle Build Files
+      run: |
+        chmod +x Android_Code/gradlew || true
+        ls -la Android_Code/app/build.gradle
+        grep -E "(compileSdkVersion|targetSdkVersion|minSdkVersion)" Android_Code/app/build.gradle
+        
+    - name: Generate Test Report
+      if: always()
+      run: |
+        echo "# Test Report" > test-report.md
+        echo "" >> test-report.md
+        echo "## Android 15/16 Upgrade Validation" >> test-report.md
+        echo "" >> test-report.md
+        echo "Tests completed on: $(date)" >> test-report.md
+        echo "" >> test-report.md
+        echo "### Configuration" >> test-report.md
+        echo "- Python version: $(python3 --version)" >> test-report.md
+        echo "- Java version: $(java -version 2>&1 | head -n 1)" >> test-report.md
+        
+    - name: Upload Test Report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-report
+        path: test-report.md
+
+  test-apk-structure:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: Verify APK Tools
+      run: |
+        ls -lh Jar_utils/apktool.jar
+        ls -lh Jar_utils/sign.jar
+        java -jar Jar_utils/apktool.jar --version || echo "apktool check complete"
+        
+    - name: Verify Android Project Structure
+      run: |
+        echo "Checking Android project structure..."
+        test -d Android_Code/app/src/main/java/com/example/reverseshell2
+        test -f Android_Code/app/src/main/AndroidManifest.xml
+        test -f Android_Code/app/build.gradle
+        echo "✓ Android project structure verified"
+        
+    - name: Check Android 15+ Permissions in Manifest
+      run: |
+        echo "Checking Android 15+ permissions..."
+        grep -q "BODY_SENSORS_BACKGROUND" Android_Code/app/src/main/AndroidManifest.xml
+        grep -q "ACCESS_MEDIA_PROJECTION_STATE" Android_Code/app/src/main/AndroidManifest.xml
+        grep -q "FOREGROUND_SERVICE_HEALTH" Android_Code/app/src/main/AndroidManifest.xml
+        echo "✓ Android 15+ permissions found in manifest"
+        
+    - name: Check MainActivity Android 15+ Support
+      run: |
+        echo "Checking MainActivity for Android 15+ support..."
+        grep -q "Build.VERSION.SDK_INT >= 35" Android_Code/app/src/main/java/com/example/reverseshell2/MainActivity.java
+        grep -q "BODY_SENSORS_BACKGROUND" Android_Code/app/src/main/java/com/example/reverseshell2/MainActivity.java
+        echo "✓ MainActivity has Android 15+ support"
+
+  documentation-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Check Upgrade Documentation
+      run: |
+        echo "Checking documentation..."
+        test -f ANDROID_15_16_UPGRADE.md
+        test -f README.md
+        test -f docs/ENHANCED_FEATURES.md
+        
+    - name: Verify Documentation Content
+      run: |
+        echo "Verifying documentation mentions Android 15/16..."
+        grep -q -E "(Android 15|Android 16|API 35|API 36)" README.md || grep -q "13-16" README.md
+        grep -q "API 35" ANDROID_15_16_UPGRADE.md
+        echo "✓ Documentation properly updated"
+        
+    - name: Check Removed Files
+      run: |
+        echo "Verifying cleanup..."
+        ! test -f README_ORIGINAL.md || (echo "README_ORIGINAL.md should be removed" && exit 1)
+        ! test -f TESTING_SUMMARY.md || (echo "TESTING_SUMMARY.md should be removed" && exit 1)
+        ! test -f COMPREHENSIVE_GUI_ENHANCEMENT_REPORT.md || (echo "COMPREHENSIVE_GUI_ENHANCEMENT_REPORT.md should be removed" && exit 1)
+        echo "✓ Cleanup verified - unnecessary files removed"

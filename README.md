@@ -255,22 +255,94 @@ exit                         # Exit interpreter
 
 ## 🧪 Testing & Validation
 
-AndroRAT includes a comprehensive testing suite:
+AndroRAT includes a comprehensive automated testing suite with Android 15/16 validation and APK integrity checking.
 
 ### 🔍 Run Complete Test Suite
+
+**Run all tests with master test runner:**
 ```bash
-python3 tests/end_to_end_test.py
+python3 run_all_tests.py
 ```
 
-### 🧩 Individual Test Components
+This executes all test suites and generates a detailed report saved to `TEST_REPORT.txt`.
+
+### 🎯 Run Specific Test Suites
+
+**Android 15/16 Upgrade Tests:**
 ```bash
-# Core functionality tests
-python3 tests/test_androrat.py
+cd tests
+python3 test_android_15_16_upgrade.py
+```
 
-# Enhanced features testing
-python3 tests/test_enhanced_features.py
+Validates:
+- ✅ API 35 configuration
+- ✅ Android 15+ permissions
+- ✅ MainActivity API 35 handling
+- ✅ Backward compatibility
+- ✅ Documentation updates
 
-# Comprehensive system testing
+**APK Integrity Checker:**
+```bash
+cd tests
+python3 apk_integrity_checker.py /path/to/your.apk
+```
+
+Validates:
+- ✅ APK structure and signature
+- ✅ Manifest and permissions
+- ✅ SDK versions
+- ✅ Foreground service types
+- ✅ Android 15+ features
+
+**Android Compatibility Tests:**
+```bash
+cd tests
+python3 -m unittest comprehensive_functionality_test.AndroidCompatibilityTests
+```
+
+**Comprehensive System Tests:**
+```bash
+cd tests
+python3 -m unittest comprehensive_test.ComprehensiveAndroRATTests
+```
+
+### 🤖 Automated Testing (CI/CD)
+
+GitHub Actions automatically runs tests on:
+- Every push to main branches
+- All pull requests
+- Manual workflow dispatch
+
+**View test results:** Repository → Actions → "Android 15/16 Upgrade Tests"
+
+The CI/CD pipeline validates:
+- ✅ Android 15/16 upgrade implementation
+- ✅ APK project structure
+- ✅ Build configuration
+- ✅ Documentation updates
+- ✅ Permission requirements
+
+### 📊 Test Coverage
+
+The test suite provides comprehensive validation of:
+
+| Test Category | Coverage | Tests |
+|--------------|----------|-------|
+| Android 15/16 Support | API 35 upgrade | 5 tests |
+| APK Integrity | Structure & signing | 4 tests |
+| Upgrade Validation | Docs & cleanup | 4 tests |
+| Android Compatibility | Permissions & features | 4 tests |
+| System Tests | Configuration | 2 tests |
+
+**Total:** 19+ comprehensive tests ensuring system integrity
+
+### 📖 Test Documentation
+
+For detailed test documentation, see [`tests/README_TESTS.md`](tests/README_TESTS.md)
+
+---
+
+## 🧩 Original Test Components
 python3 tests/comprehensive_test.py
 ```
 
