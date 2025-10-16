@@ -520,13 +520,57 @@ AndroRAT is licensed under the **MIT License**. See the [LICENSE](LICENSE) file 
 
 ---
 
+## 🤝 Contributing
+
+We welcome contributions from the community! AndroRAT is an educational project that benefits from collaborative development.
+
+### 📋 How to Contribute
+
+- **🐛 Report Bugs**: Use our [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.yml)
+- **✨ Request Features**: Use our [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.yml)
+- **🔒 Report Security Issues**: Follow our [Security Policy](SECURITY.md)
+- **💻 Submit Code**: Read our [Contributing Guide](CONTRIBUTING.md)
+- **📚 Improve Docs**: Documentation improvements are always welcome
+
+### 📖 Community Guidelines
+
+- [Code of Conduct](CODE_OF_CONDUCT.md) - Community standards and expectations
+- [Contributing Guide](CONTRIBUTING.md) - Detailed contribution guidelines
+- [Security Policy](SECURITY.md) - Vulnerability reporting procedures
+- [Changelog](CHANGELOG.md) - Project version history
+
+### 🎯 Good First Issues
+
+Looking to contribute? Check out issues labeled:
+- `good first issue` - Perfect for newcomers
+- `help wanted` - Areas where we need assistance
+- `documentation` - Documentation improvements
+
+---
+
 ## 🔗 Links & Resources
 
-- **📚 Documentation**: [docs/](docs/) folder contains comprehensive guides
+### Documentation
+
+- **📚 Main Documentation**: [docs/](docs/) folder contains comprehensive guides
 - **💉 APK Injection Guide**: [docs/APK_INJECTION_GUIDE.md](docs/APK_INJECTION_GUIDE.md) - Complete injection documentation
+- **🎨 GUI Guide**: [docs/GUI_GUIDE.md](docs/GUI_GUIDE.md) - GUI usage instructions
+- **🔧 Modernization Guide**: [docs/MODERNIZATION_GUIDE.md](docs/MODERNIZATION_GUIDE.md) - Technical implementation details
+- **🚀 Enhanced Features**: [docs/ENHANCED_FEATURES.md](docs/ENHANCED_FEATURES.md) - Feature documentation
+
+### Development
+
 - **🧪 Testing**: [tests/](tests/) folder contains validation suite  
 - **🛠️ Tools**: [tools/](tools/) folder contains utility scripts
 - **📱 Android Source**: [Android_Code/](Android_Code/) contains client implementation
+- **🔄 Changelog**: [CHANGELOG.md](CHANGELOG.md) - Version history and updates
+
+### Community
+
+- **🐦 Twitter**: [@karma9874](https://twitter.com/karma9874) - Follow for updates
+- **📝 Issues**: [GitHub Issues](https://github.com/shadow-dragon-2002/AndroRAT/issues) - Bug reports and features
+- **💬 Discussions**: [GitHub Discussions](https://github.com/shadow-dragon-2002/AndroRAT/discussions) - Community Q&A
+- **🔒 Security**: [Security Policy](SECURITY.md) - Responsible disclosure
 
 ---
 
